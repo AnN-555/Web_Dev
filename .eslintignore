@@ -1,0 +1,8 @@
+# Eslint does not honor gitignore by default, unlike prettier, so this exists.
+node_modules/
+.devbox/
+.prettierrc.js
+.prettierignore
+.gitignore
+.git
+.idea

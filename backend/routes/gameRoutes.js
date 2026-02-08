@@ -1,5 +1,7 @@
 import express from "express";
 import Game from "../models/game.js";
+import upload from "../middleware/upload.js";
+import cloudinary from "../config/cloudinary.js";
 
 const router = express.Router();
 
@@ -123,49 +125,74 @@ router.get("/tags/all", async (req, res) => {
   }
 });
 
-// POST /api/games - Tạo game mới
-router.post("/", async (req, res) => {
+// POST /api/games - Tạo game mới với ảnh
+router.post("/", upload.fields([
+  { name: "headerImage", maxCount: 1 },
+  { name: "images", maxCount: 10 }
+]), async (req, res) => {
   try {
-    const game = new Game(req.body);
-    await game.save();
+    const { name, description, link, tags } = req.body;
 
-    res.status(201).json({
-      success: true,
-      data: game,
+    // Upload header image
+    let headerImageUrl = null;
+    if (req.files.headerImage && req.files.headerImage[0]) {
+      const result = await cloudinary.uploader.upload(req.files.headerImage[0].path, {
+        folder: `database/${name}/header`
+      });
+      headerImageUrl = result.secure_url;
+    }
+
+    // Upload other images
+    const images = [];
+    if (req.files.images) {
+      for (const file of req.files.images) {
+        const result = await cloudinary.uploader.upload(file.path, {
+          folder: `database/${name}/images`
+        });
+        images.push(result.secure_url);
+      }
+    }
+
+    const game = new Game({
+      name,
+      description,
+      link,
+      headerImage: headerImageUrl,
+      images,
+      tags
     });
+
+    await game.save();
+    res.status(201).json({ success: true, data: game });
   } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
+    res.status(400).json({ success: false, message: error.message });
   }
 });
 
-// PUT /api/games/:id - Cập nhật game
-router.put("/:id", async (req, res) => {
+// PUT /api/games/:id - Cập nhật game với ảnh mới
+router.put("/:id", upload.single("headerImage"), async (req, res) => {
   try {
-    const game = await Game.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    );
+    let updateData = { ...req.body };
 
-    if (!game) {
-      return res.status(404).json({
-        success: false,
-        message: "Game not found",
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: `database/${updateData.name || "gamestore"}/header`,
       });
+      updateData.headerImage = result.secure_url;
     }
 
-    res.json({
-      success: true,
-      data: game,
+    const game = await Game.findByIdAndUpdate(req.params.id, updateData, {
+      new: true,
+      runValidators: true,
     });
+
+    if (!game) {
+      return res.status(404).json({ success: false, message: "Game not found" });
+    }
+
+    res.json({ success: true, data: game });
   } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
+    res.status(400).json({ success: false, message: error.message });
   }
 });
 

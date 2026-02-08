@@ -4,13 +4,13 @@ import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import connectDB from "../config/database.js";
 import Game from "../models/game.js";
+import cloudinary from "../config/cloudinary.js";
 
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Folder chứa dữ liệu game
 const DATABASE_FOLDER = path.join(__dirname, "../../database");
 
 const slugify = (name) =>
@@ -24,9 +24,7 @@ async function importGames() {
     .filter((d) => d.isDirectory())
     .map((d) => d.name);
 
-  let imported = 0,
-    skipped = 0,
-    errors = 0;
+  let imported = 0, skipped = 0, errors = 0;
 
   for (const name of folders) {
     try {
@@ -38,30 +36,40 @@ async function importGames() {
         continue;
       }
 
-      // Check trùng
       if (await Game.findOne({ name })) {
         skipped++;
         continue;
       }
 
-      // Read link
       const link = fs.readFileSync(linkFile, "utf-8").trim();
 
-      // Read tags
       const tagsFile = path.join(gameDir, "tags.txt");
       const tags = fs.existsSync(tagsFile)
-        ? fs
-            .readFileSync(tagsFile, "utf-8")
+        ? fs.readFileSync(tagsFile, "utf-8")
             .split("\n")
             .map((t) => t.trim())
             .filter(Boolean)
         : [];
 
-      // Read images (1.jpg → 10.jpg)
+      // Upload header image
+      let headerImageUrl = null;
+      const headerPath = path.join(gameDir, "header.jpg");
+      if (fs.existsSync(headerPath)) {
+        const result = await cloudinary.uploader.upload(headerPath, {
+          folder: "gamestore/header",
+        });
+        headerImageUrl = result.secure_url;
+      }
+
+      // Upload other images
       const images = [];
       for (let i = 1; i <= 10; i++) {
-        if (fs.existsSync(path.join(gameDir, `${i}.jpg`))) {
-          images.push(path.join(name, `${i}.jpg`));
+        const imgPath = path.join(gameDir, `${i}.jpg`);
+        if (fs.existsSync(imgPath)) {
+          const result = await cloudinary.uploader.upload(imgPath, {
+            folder: "gamestore/images",
+          });
+          images.push(result.secure_url);
         }
       }
 
@@ -69,7 +77,7 @@ async function importGames() {
         name,
         slug: slugify(name),
         link,
-        headerImage: path.join(name, "header.jpg"),
+        headerImage: headerImageUrl,
         images,
         tags,
       });
@@ -77,17 +85,12 @@ async function importGames() {
       await game.save();
       imported++;
     } catch (err) {
+      console.error("Error importing", name, err);
       errors++;
     }
   }
 
-  console.log({
-    imported,
-    skipped,
-    errors,
-    total: folders.length,
-  });
-
+  console.log({ imported, skipped, errors, total: folders.length });
   process.exit(0);
 }
 

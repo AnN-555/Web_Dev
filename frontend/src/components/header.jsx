@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext.jsx';
 import './header.css';
 
 const Header = () => {
+    const { user, logout, loading } = useAuth();
     return (
         <header className='header'>
             <div className='container'>
@@ -20,7 +22,20 @@ const Header = () => {
                     </nav>
 
                     <div className="user">
-                        <Link to="/" className="btn btn-login">Login / Register</Link>
+                        {loading ? (
+                            <span className="header-loading">...</span>
+                        ) : user ? (
+                            <div className="user-menu">
+                                <span className="user-name">
+                                    <i className="fas fa-user"></i> {user.username}
+                                </span>
+                                <button onClick={logout} className="btn btn-logout">
+                                    Logout
+                                </button>
+                            </div>
+                        ) : (
+                            <Link to="/login" className="btn btn-login">Login / Register</Link>
+                        )}
                     </div>
                 </div>
             </div>

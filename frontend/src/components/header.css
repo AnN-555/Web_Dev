@@ -83,6 +83,44 @@
   box-shadow: 0 5px 15px rgba(255, 107, 53, 0.4);
 }
 
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-name {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.95rem;
+}
+
+.user-name i {
+  margin-right: 0.35rem;
+  color: #ff6b35;
+}
+
+.btn-logout {
+  background: transparent;
+  color: white;
+  padding: 8px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-logout:hover {
+  background: rgba(255, 107, 53, 0.2);
+  border-color: #ff6b35;
+  color: #ff6b35;
+}
+
+.header-loading {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1rem;
+}
+
 @media (max-width: 768px) {
   .header-content {
     flex-direction: column;

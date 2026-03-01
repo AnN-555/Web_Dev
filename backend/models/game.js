@@ -53,6 +53,17 @@ const gameSchema = new mongoose.Schema(
       min: 0,
       max: 5,
     },
+    details: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    // Đơn vị: VND
+    price: {
+      type: Number,
+      min: 0,
+      default: 0,
+    },
   },
   {
     timestamps: true, // Adds createdAt and updatedAt

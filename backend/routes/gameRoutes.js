@@ -1,5 +1,7 @@
 import express from "express";
 import Game from "../models/game.js";
+import Comment from "../models/comment.js";
+import { protect} from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -23,7 +25,7 @@ router.get("/", async (req, res) => {
     }
 
     if (featured === "true") {
-      query.featured = true;
+      query.rating = 5;
     }
 
     if (search) {
@@ -56,6 +58,49 @@ router.get("/", async (req, res) => {
       success: false,
       message: error.message,
     });
+  }
+});
+
+// GET /api/games/:gameId/comments - Lấy comment của game (đặt trước /:id)
+router.get("/:gameId/comments", async (req, res) => {
+  try {
+    const { gameId } = req.params;
+    const game = await Game.findById(gameId);
+    if (!game) {
+      return res.status(404).json({ success: false, message: "Game not found" });
+    }
+    const comments = await Comment.find({ game: gameId })
+      .sort("-createdAt")
+      .populate("user", "username")
+      .lean();
+    res.json({ success: true, data: comments });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// POST /api/games/:gameId/comments - Thêm comment (cần đăng nhập)
+router.post("/:gameId/comments", protect, async (req, res) => {
+  try {
+    const { gameId } = req.params;
+    const { text } = req.body;
+    const game = await Game.findById(gameId);
+    if (!game) {
+      return res.status(404).json({ success: false, message: "Game not found" });
+    }
+    if (!text || !String(text).trim()) {
+      return res.status(400).json({ success: false, message: "Nội dung comment không được để trống" });
+    }
+    const comment = new Comment({
+      game: gameId,
+      user: req.user._id,
+      text: String(text).trim().slice(0, 1000),
+    });
+    await comment.save();
+    await comment.populate("user", "username");
+    res.status(201).json({ success: true, data: comment });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 

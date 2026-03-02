@@ -18,7 +18,9 @@ const Games = () => {
   const fetchTags = async () => {
     try {
       const response = await gameAPI.getAllTags();
-      setTags(response.data);
+      const rawTags = Array.isArray(response.data) ? response.data : [];
+      const limitedTags = rawTags.slice(0, 15);
+      setTags(limitedTags);
     } catch (error) {
       console.error('Error fetching tags:', error);
     }
@@ -29,11 +31,6 @@ const Games = () => {
     setSearchQuery('');
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    // Search will be handled by GameList component via URL params
-  };
-
   return (
     <div className="games-page">
       <div className="container">
@@ -41,29 +38,7 @@ const Games = () => {
           <h1>
             <i className="fas fa-gamepad"></i> All Games
           </h1>
-          
-          {/* Search Bar */}
-          <form onSubmit={handleSearch} className="search-form">
-            <div className="search-input-wrapper">
-              <i className="fas fa-search"></i>
-              <input
-                type="text"
-                placeholder="Tìm kiếm game..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="search-input"
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery('')}
-                  className="search-clear"
-                >
-                  <i className="fas fa-times"></i>
-                </button>
-              )}
-            </div>
-          </form>
+        
 
           {/* Tags Filter */}
           {tags.length > 0 && (

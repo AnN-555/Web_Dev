@@ -173,6 +173,17 @@
   color: #f37243;
 }
 
+.section-title .stars-5 {
+  display: inline-flex;
+  gap: 2px;
+  margin-right: 8px;
+  color: #ffd700;
+}
+
+.section-title .stars-5 + * {
+  margin-left: 0;
+}
+
 .section-link {
   color: #ff6b35;
   font-weight: 600;

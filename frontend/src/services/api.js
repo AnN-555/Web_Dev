@@ -9,6 +9,17 @@ const api = axios.create({
   },
 });
 
+const TOKEN_KEY = 'game_store_token';
+
+// Gửi kèm token khi gọi API cần đăng nhập
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem(TOKEN_KEY);
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 // Game API
 export const gameAPI = {
   // Lấy danh sách games
@@ -52,6 +63,18 @@ export const gameAPI = {
     const response = await api.delete(`/games/${id}`);
     return response.data;
   },
+
+// Lấy comment theo game
+  getComments: async (gameId) => {
+    const response = await api.get(`/games/${gameId}/comments`);
+    return response.data;
+  },
+
+  // Thêm comment (cần đăng nhập)
+  addComment: async (gameId, text) => {
+    const response = await api.post(`/games/${gameId}/comments`, { text });
+    return response.data;
+  },
 };
 
 // Authentication API
@@ -73,4 +96,46 @@ export const authAPI = {
     return response.data;
   },
 };
+
+// Cart API (requires login)
+export const cartAPI = {
+  getCart: async () => {
+    const response = await api.get('/cart');
+    return response.data;
+  },
+  addToCart: async (gameId) => {
+    const response = await api.post('/cart/add', { gameId });
+    return response.data;
+  },
+  removeFromCart: async (gameId) => {
+    const response = await api.delete(`/cart/item/${gameId}`);
+    return response.data;
+  },
+  checkout: async () => {
+    const response = await api.post('/cart/checkout');
+    return response.data;
+  },
+};
+
+// Order API (requires login)
+export const orderAPI = {
+  /** Mua game – body: { gameId } */
+  createOrder: async (gameId) => {
+    const response = await api.post('/orders', { gameId });
+    return response.data;
+  },
+
+  /** Lấy danh sách đơn hàng của user */
+  getMyOrders: async () => {
+    const response = await api.get('/orders');
+    return response.data;
+  },
+
+  /** Chi tiết một đơn */
+  getOrderById: async (id) => {
+    const response = await api.get(`/orders/${id}`);
+    return response.data;
+  },
+};
+
 export default api;

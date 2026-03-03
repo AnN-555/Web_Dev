@@ -25,6 +25,7 @@ async function importGames() {
     .map((d) => d.name);
 
   let imported = 0,
+    update =0;
     skipped = 0,
     errors = 0;
 
@@ -34,12 +35,6 @@ async function importGames() {
       const linkFile = path.join(gameDir, "link.txt");
 
       if (!fs.existsSync(linkFile)) {
-        skipped++;
-        continue;
-      }
-
-      // Check trùng
-      if (await Game.findOne({ name })) {
         skipped++;
         continue;
       }
@@ -57,6 +52,21 @@ async function importGames() {
             .filter(Boolean)
         : [];
 
+      // Read details (optional)
+      const detailsFile = path.join(gameDir, "details.txt");
+      const details = fs.existsSync(detailsFile)
+        ? fs.readFileSync(detailsFile, "utf-8").trim()
+        : "";
+
+      // Read price (optional, số VND)
+      const priceFile = path.join(gameDir, "price.txt");
+      let price = 0;
+      if (fs.existsSync(priceFile)) {
+        const raw = fs.readFileSync(priceFile, "utf-8").trim();
+        const num = parseInt(raw, 10);
+        if (!Number.isNaN(num) && num >= 0) price = num;
+      }
+
       // Read images (1.jpg → 10.jpg)
       const images = [];
       for (let i = 1; i <= 10; i++) {
@@ -65,24 +75,41 @@ async function importGames() {
         }
       }
 
-      const game = new Game({
-        name,
-        slug: slugify(name),
-        link,
-        headerImage: path.join(name, "header.jpg"),
-        images,
-        tags,
-      });
+      const existingGame = await Game.findOne({ name });
 
-      await game.save();
-      imported++;
+      if (existingGame) {
+        // Cập nhật game đã có: link, tags, images luôn sync; details/price chỉ khi có file
+        existingGame.link = link;
+        existingGame.tags = tags;
+        existingGame.images = images;
+        if (fs.existsSync(detailsFile)) existingGame.details = details;
+        if (fs.existsSync(priceFile)) existingGame.price = price;
+        await existingGame.save();
+        updated++;
+      } else {
+        // Tạo mới
+        const game = new Game({
+          name,
+          slug: slugify(name),
+          link,
+          headerImage: path.join(name, "header.jpg"),
+          images,
+          tags,
+          details: details || undefined,
+          price,
+        });
+        await game.save();
+        imported++;
+      }
     } catch (err) {
       errors++;
+      console.error(`Error with "${name}":`, err.message);
     }
   }
 
   console.log({
     imported,
+    updated,
     skipped,
     errors,
     total: folders.length,

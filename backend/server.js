@@ -6,6 +6,8 @@ import { fileURLToPath } from 'url';
 import connectDB from './config/database.js';
 import gameRoutes from './routes/gameRoutes.js';
 import authRoutes from './routes/authRoutes.js';
+import cartRoutes from './routes/cartRoutes.js';
+import orderRoutes from './routes/orderRoutes.js';
 
 dotenv.config();
 
@@ -24,6 +26,8 @@ app.use('/database', express.static(path.join(__dirname, '../database')));
 // Routes
 app.use('/api/games', gameRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/cart', cartRoutes);
+app.use('/api/orders', orderRoutes);
 
 // Health check
 app.get('/', (req, res) => {

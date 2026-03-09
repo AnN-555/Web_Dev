@@ -1,8 +1,10 @@
-import router from "./authRoutes.js";
+import express from "express";
 import Cart from "../models/cart.js";
 import Order from "../models/order.js";
 import Game from "../models/game.js";
 import { protect } from "../middleware/authMiddleware.js";
+
+const router = express.Router();
 
 // Health check (no auth) - verify cart routes are loaded
 router.get("/ping", (req, res) => res.json({ ok: true, message: "Cart API is ready" }));
@@ -20,6 +22,10 @@ router.get("/", async (req, res) => {
       cart = await Cart.create({ user: req.user._id, items: [] });
       await cart.populate("items.game", "name slug price headerImage");
     }
+    // Disable caching so client always receives fresh cart data
+    res.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+    res.set("Pragma", "no-cache");
+    res.set("Expires", "0");
     res.json({ success: true, data: cart });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

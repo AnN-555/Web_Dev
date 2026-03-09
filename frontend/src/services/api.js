@@ -100,7 +100,7 @@ export const authAPI = {
 // Cart API (requires login)
 export const cartAPI = {
   getCart: async () => {
-    const response = await api.get('/cart');
+    const response = await api.get('/cart', { params: { t: Date.now() } });
     return response.data;
   },
   addToCart: async (gameId) => {

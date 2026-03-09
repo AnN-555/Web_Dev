@@ -289,6 +289,20 @@ const GameDetail = () => {
                 <i className="fas fa-arrow-left"></i> Back to list
               </Link>
             </div>
+
+            {game.link && (
+              <div className="sidebar-card">
+                <a
+                  href={game.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-secondary"
+                  style={{ width: '100%', textAlign: 'center' }}
+                >
+                  <i className="fas fa-external-link-alt"></i> Visit publisher page
+                </a>
+              </div>
+            )}
           </div>
         </div>
 

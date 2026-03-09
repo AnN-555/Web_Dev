@@ -71,7 +71,7 @@ const Header = () => {
                             <Link to='/games'>Games</Link>
                             <Link to='/'>Blog</Link>
                             <Link to='/'>Forums</Link>
-                            <Link to='/'>Contact</Link>
+                            <Link to='/contact'>Contact</Link>
                         </nav>
 
                         <div className="header-search">

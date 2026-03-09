@@ -15,6 +15,11 @@ const Games = () => {
     fetchTags();
   }, []);
 
+  useEffect(() => {
+    setSelectedTag(searchParams.get('tag') || '');
+    setSearchQuery(searchParams.get('search') || '');
+  }, [searchParams]);
+
   const fetchTags = async () => {
     try {
       const response = await gameAPI.getAllTags();

@@ -2,12 +2,9 @@ import { Link } from 'react-router-dom';
 import './game-card.css';
 
 const GameCard = ({ game }) => {
-
-    // Lấy base URL của API để tái sử dụng cho ảnh
-    const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
-    // Bỏ hậu tố `/api` để lấy domain gốc của backend
-    const IMAGE_BASE_URL = API_BASE_URL.replace(/\/api\/?$/, '');
-    const imagePath = `${IMAGE_BASE_URL}/database/${game.headerImage}`;
+    // return full URL Cloudinary for headerImage,
+    const imagePath = game.headerImage;
+    console.log('GameCard headerImage:', game.headerImage);
 
     return (
         <div className='game-card'>

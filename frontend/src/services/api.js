@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -24,55 +24,55 @@ api.interceptors.request.use((config) => {
 export const gameAPI = {
   // Lấy danh sách games
   getGames: async (params = {}) => {
-    const response = await api.get('/games', { params });
+    const response = await api.get('api/games', { params });
     return response.data;
   },
 
   // Lấy game theo ID
   getGameById: async (id) => {
-    const response = await api.get(`/games/${id}`);
+    const response = await api.get(`api/games/${id}`);
     return response.data;
   },
 
   // Lấy game theo slug
   getGameBySlug: async (slug) => {
-    const response = await api.get(`/games/slug/${slug}`);
+    const response = await api.get(`api/games/slug/${slug}`);
     return response.data;
   },
 
   // Lấy tất cả tags
   getAllTags: async () => {
-    const response = await api.get('/games/tags/all');
+    const response = await api.get('api/games/tags/all');
     return response.data;
   },
 
   // Tạo game mới
   createGame: async (gameData) => {
-    const response = await api.post('/games', gameData);
+    const response = await api.post('api/games', gameData);
     return response.data;
   },
 
   // Cập nhật game
   updateGame: async (id, gameData) => {
-    const response = await api.put(`/games/${id}`, gameData);
+    const response = await api.put(`api/games/${id}`, gameData);
     return response.data;
   },
 
   // Xóa game
   deleteGame: async (id) => {
-    const response = await api.delete(`/games/${id}`);
+    const response = await api.delete(`api/games/${id}`);
     return response.data;
   },
 
 // Lấy comment theo game
   getComments: async (gameId) => {
-    const response = await api.get(`/games/${gameId}/comments`);
+    const response = await api.get(`api/games/${gameId}/comments`);
     return response.data;
   },
 
   // Thêm comment (cần đăng nhập)
   addComment: async (gameId, text) => {
-    const response = await api.post(`/games/${gameId}/comments`, { text });
+    const response = await api.post(`api/games/${gameId}/comments`, { text });
     return response.data;
   },
 };
@@ -80,19 +80,19 @@ export const gameAPI = {
 // Authentication API
 export const authAPI = {
   register: async (username, email, password) => {
-    const response = await api.post('/auth/register', { username, email, password });
+    const response = await api.post('api/auth/register', { username, email, password });
     return response.data;
   },
   login: async (email, password) => {
-    const response = await api.post('/auth/login', { email, password });
+    const response = await api.post('api/auth/login', { email, password });
     return response.data;
   },
   logout: async () => {
-    const response = await api.post('/auth/logout');
+    const response = await api.post('api/auth/logout');
     return response.data;
   },
   getMe: async () => {
-    const response = await api.get('/auth/me');
+    const response = await api.get('api/auth/me');
     return response.data;
   },
 };
@@ -100,19 +100,19 @@ export const authAPI = {
 // Cart API (requires login)
 export const cartAPI = {
   getCart: async () => {
-    const response = await api.get('/cart', { params: { t: Date.now() } });
+    const response = await api.get('api/cart', { params: { t: Date.now() } });
     return response.data;
   },
   addToCart: async (gameId) => {
-    const response = await api.post('/cart/add', { gameId });
+    const response = await api.post('api/cart/add', { gameId });
     return response.data;
   },
   removeFromCart: async (gameId) => {
-    const response = await api.delete(`/cart/item/${gameId}`);
+    const response = await api.delete(`api/cart/item/${gameId}`);
     return response.data;
   },
   checkout: async () => {
-    const response = await api.post('/cart/checkout');
+    const response = await api.post('api/cart/checkout');
     return response.data;
   },
 };
@@ -121,19 +121,19 @@ export const cartAPI = {
 export const orderAPI = {
   /** Mua game – body: { gameId } */
   createOrder: async (gameId) => {
-    const response = await api.post('/orders', { gameId });
+    const response = await api.post('api/orders', { gameId });
     return response.data;
   },
 
   /** Lấy danh sách đơn hàng của user */
   getMyOrders: async () => {
-    const response = await api.get('/orders');
+    const response = await api.get('api/orders');
     return response.data;
   },
 
   /** Chi tiết một đơn */
   getOrderById: async (id) => {
-    const response = await api.get(`/orders/${id}`);
+    const response = await api.get(`api/orders/${id}`);
     return response.data;
   },
 };

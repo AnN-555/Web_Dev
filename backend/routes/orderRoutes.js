@@ -1,7 +1,9 @@
-import router from "./authRoutes.js";
+import express from "express";
 import Order from "../models/order.js";
 import Game from "../models/game.js";
 import { protect } from "../middleware/authMiddleware.js";
+
+const router = express.Router();
 
 // Tất cả route orders đều cần đăng nhập
 router.use(protect);

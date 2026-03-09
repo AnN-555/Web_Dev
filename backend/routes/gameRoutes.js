@@ -1,8 +1,10 @@
+import express from "express";
 import Game from "../models/game.js";
 import Comment from "../models/comment.js";
 import { protect } from "../middleware/authMiddleware.js";
 import cloudinary from "../config/cloudinary.js";
-import router from "./authRoutes.js";
+
+const router = express.Router();
 
 // direct to Cloudinary URL
 const toCloudinaryUrl = (value) => {
@@ -47,7 +49,7 @@ router.get("/", async (req, res) => {
     }
 
     if (search) {
-      query.$text = { $search: search };
+      query.name = { $regex: search, $options: "i" };
     }
 
     // Calculate pagination

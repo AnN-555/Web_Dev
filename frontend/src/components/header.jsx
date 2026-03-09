@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { cartAPI } from '../services/api.js';
@@ -8,6 +8,8 @@ const Header = () => {
     const { user, logout, loading } = useAuth();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [cartCount, setCartCount] = useState(0);
+    const [searchText, setSearchText] = useState('');
+    const navigate = useNavigate();
 
     const refreshCartCount = () => {
         if (user) {
@@ -39,6 +41,21 @@ const Header = () => {
         logout();
     };
 
+    const handleSearch = () => {
+        const query = searchText.trim();
+        if (!query) {
+            navigate('/games');
+            return;
+        }
+        navigate(`/games?search=${encodeURIComponent(query)}`);
+    };
+
+    const handleSearchKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    };
+
     return (
         <header className='header'>
             <div className='container'>
@@ -51,7 +68,7 @@ const Header = () => {
                     <div className="header-center">
                         <nav className='nav'>
                             <Link to='/'>Home</Link>
-                            <Link to='/'>Games</Link>
+                            <Link to='/games'>Games</Link>
                             <Link to='/'>Blog</Link>
                             <Link to='/'>Forums</Link>
                             <Link to='/'>Contact</Link>
@@ -62,8 +79,15 @@ const Header = () => {
                                 type="text"
                                 placeholder="Search games..."
                                 className="header-search-input"
+                                    value={searchText}
+                                    onChange={(e) => setSearchText(e.target.value)}
+                                    onKeyDown={handleSearchKeyDown}
                             />
-                            <button type="button" className="header-search-btn">
+                                <button
+                                    type="button"
+                                    className="header-search-btn"
+                                    onClick={handleSearch}
+                                >
                                 <i className="fas fa-search"></i>
                             </button>
                         </div>

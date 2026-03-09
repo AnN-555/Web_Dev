@@ -5,10 +5,6 @@ import GameCard from '../components/game-card.jsx';
 import './home.css';
 
 const Home = () => {
-  // Lấy base URL của API để tái sử dụng cho ảnh
-  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
-  const IMAGE_BASE_URL = API_BASE_URL.replace(/\/api\/?$/, '');
-
   const [featuredGames, setFeaturedGames] = useState([]);
   const [latestGames, setLatestGames] = useState([]);
   const [bannerGames, setBannerGames] = useState([]);
@@ -67,8 +63,7 @@ const Home = () => {
         {bannerGames.length > 0 && (
           <div className="hero-carousel">
             {bannerGames.map((game, index) => {
-              const bannerImage = `${IMAGE_BASE_URL}/database/${game.headerImage}`;
-
+              const bannerImage = game.headerImage;
               const isActive = index === currentSlide;
 
               return (

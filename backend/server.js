@@ -20,9 +20,6 @@ const PORT = process.env.PORT || 8000;
 app.use(cors());
 app.use(express.json());
 
-// Serve static files from database folder
-app.use('/database', express.static(path.join(__dirname, '../database')));
-
 // Routes
 app.use('/api/games', gameRoutes);
 app.use('/api/auth', authRoutes);

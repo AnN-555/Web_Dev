@@ -1,10 +1,8 @@
-import express from "express";
+import router from "./authRoutes.js";
 import Cart from "../models/cart.js";
 import Order from "../models/order.js";
 import Game from "../models/game.js";
 import { protect } from "../middleware/authMiddleware.js";
-
-const router = express.Router();
 
 // Health check (no auth) - verify cart routes are loaded
 router.get("/ping", (req, res) => res.json({ ok: true, message: "Cart API is ready" }));

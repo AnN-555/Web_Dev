@@ -1,9 +1,27 @@
-import express from "express";
 import Game from "../models/game.js";
 import Comment from "../models/comment.js";
-import { protect} from "../middleware/authMiddleware.js";
+import { protect } from "../middleware/authMiddleware.js";
+import cloudinary from "../config/cloudinary.js";
+import router from "./authRoutes.js";
 
-const router = express.Router();
+// direct to Cloudinary URL
+const toCloudinaryUrl = (value) => {
+  if (!value) return value;
+  if (Array.isArray(value)) {
+    return value.map((v) => toCloudinaryUrl(v));
+  }
+  if (typeof value !== "string") return value;
+  if (/^https?:\/\//i.test(value)) return value;
+  return cloudinary.url(value, { secure: true });
+};
+
+const mapGameImages = (game) => {
+  if (!game) return game;
+  const obj = game.toObject ? game.toObject() : { ...game };
+  obj.headerImage = toCloudinaryUrl(obj.headerImage);
+  obj.images = toCloudinaryUrl(obj.images || []);
+  return obj;
+};
 
 // GET /api/games - Lấy tất cả games
 router.get("/", async (req, res) => {
@@ -41,11 +59,13 @@ router.get("/", async (req, res) => {
       .skip(skip)
       .limit(parseInt(limit));
 
+    const mappedGames = games.map(mapGameImages);
+
     const total = await Game.countDocuments(query);
 
     res.json({
       success: true,
-      data: games,
+      data: mappedGames,
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),
@@ -118,7 +138,7 @@ router.get("/:id", async (req, res) => {
 
     res.json({
       success: true,
-      data: game,
+      data: mapGameImages(game),
     });
   } catch (error) {
     res.status(500).json({
@@ -142,7 +162,7 @@ router.get("/slug/:slug", async (req, res) => {
 
     res.json({
       success: true,
-      data: game,
+      data: mapGameImages(game),
     });
   } catch (error) {
     res.status(500).json({
@@ -162,52 +182,6 @@ router.get("/tags/all", async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-});
-
-// POST /api/games - Tạo game mới
-router.post("/", async (req, res) => {
-  try {
-    const game = new Game(req.body);
-    await game.save();
-
-    res.status(201).json({
-      success: true,
-      data: game,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
-});
-
-// PUT /api/games/:id - Cập nhật game
-router.put("/:id", async (req, res) => {
-  try {
-    const game = await Game.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    );
-
-    if (!game) {
-      return res.status(404).json({
-        success: false,
-        message: "Game not found",
-      });
-    }
-
-    res.json({
-      success: true,
-      data: game,
-    });
-  } catch (error) {
-    res.status(400).json({
       success: false,
       message: error.message,
     });

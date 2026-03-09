@@ -4,9 +4,6 @@ import { gameAPI, orderAPI, cartAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import './game-detail.css';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
-const IMAGE_BASE_URL = API_BASE_URL.replace(/\/api\/?$/, '');
-
 const formatPrice = (price) => {
   if (price == null || price === 0) return 'Free';
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
@@ -147,8 +144,8 @@ const GameDetail = () => {
   }
 
   const galleryImages = [
-    `${IMAGE_BASE_URL}/database/${game.headerImage}`,
-    ...(game.images || []).map((image) => `${IMAGE_BASE_URL}/database/${image}`),
+    game.headerImage,
+    ...(game.images || []),
   ].filter(Boolean);
 
   return (

@@ -9,6 +9,7 @@ import Login from './pages/login.jsx';
 import Register from './pages/register.jsx';
 import Cart from './pages/cart.jsx';
 import Orders from './pages/orders.jsx';
+import Profile from "./pages/profile";
 import './App.css';
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
             <Route path="/orders" element={<Orders />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/profile" element={<Profile />} />
           </Routes>
           <Footer />
         </div>

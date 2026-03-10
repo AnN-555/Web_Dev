@@ -64,7 +64,7 @@ export const gameAPI = {
     return response.data;
   },
 
-// Lấy comment theo game
+  // Lấy comment theo game
   getComments: async (gameId) => {
     const response = await api.get(`/games/${gameId}/comments`);
     return response.data;
@@ -137,5 +137,13 @@ export const orderAPI = {
     return response.data;
   },
 };
+export const userAPI = {
 
+  getProfile: () => api.get("/users/profile"),
+
+  updateProfile: (data) => api.put("/users/profile", data),
+
+  changePassword: (data) => api.put("/users/change-password", data)
+
+};
 export default api;

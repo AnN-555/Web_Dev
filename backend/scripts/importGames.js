@@ -25,9 +25,9 @@ async function importGames() {
     .map((d) => d.name);
 
   let imported = 0,
-    update =0;
-    skipped = 0,
-    errors = 0;
+      updated = 0,
+      skipped = 0,
+      errors = 0;
 
   for (const name of folders) {
     try {

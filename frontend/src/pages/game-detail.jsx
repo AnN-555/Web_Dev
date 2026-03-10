@@ -11,7 +11,7 @@ const formatPrice = (price) => {
 
 const GameDetail = () => {
   const { slug } = useParams();
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [game, setGame] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

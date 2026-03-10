@@ -1,0 +1,125 @@
+.forum-detail-page {
+  padding: 32px 0;
+}
+
+.forum-detail-topbar {
+  margin-bottom: 14px;
+}
+
+.forum-post {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.forum-post-title {
+  margin: 0 0 8px;
+  line-height: 1.25;
+}
+
+.forum-post-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  opacity: 0.85;
+  margin-bottom: 12px;
+}
+
+.forum-post-author {
+  font-weight: 700;
+}
+
+.forum-post-dot {
+  opacity: 0.8;
+}
+
+.forum-post-content {
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+.forum-comments {
+  margin-top: 18px;
+}
+
+.forum-section-title {
+  margin: 0 0 10px;
+}
+
+.forum-comment-form {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.forum-comment-textarea {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.25);
+  color: inherit;
+  border-radius: 12px;
+  padding: 10px 12px;
+  outline: none;
+  resize: vertical;
+}
+
+.forum-comment-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.forum-login-hint {
+  opacity: 0.9;
+  margin: 8px 0 12px;
+}
+
+.forum-login-hint a {
+  text-decoration: underline;
+}
+
+.forum-comment-list {
+  margin-top: 12px;
+  display: grid;
+  gap: 10px;
+}
+
+.forum-comment-item {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 12px;
+}
+
+.forum-comment-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  opacity: 0.85;
+  margin-bottom: 6px;
+}
+
+.forum-comment-user {
+  font-weight: 700;
+}
+
+.forum-comment-text {
+  white-space: pre-wrap;
+  line-height: 1.55;
+}
+
+.forum-empty {
+  opacity: 0.85;
+  padding: 10px 0;
+}
+
+.forum-detail-error {
+  margin: 12px 0 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255, 72, 72, 0.12);
+  border: 1px solid rgba(255, 72, 72, 0.25);
+}

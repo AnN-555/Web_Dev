@@ -29,7 +29,7 @@ const Cart = () => {
       setLoading(true);
       const res = await cartAPI.getCart();
       setCart(res.data);
-    } catch (err) {
+    } catch {
       setCart({ items: [] });
     } finally {
       setLoading(false);

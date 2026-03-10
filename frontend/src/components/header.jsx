@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext.jsx';
-import { cartAPI } from '../services/api.js';
+import { useCallback, useEffect, useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { cartAPI } from '../services/api';
 import './header.css';
 
 const Header = () => {
@@ -11,26 +11,29 @@ const Header = () => {
     const [searchText, setSearchText] = useState('');
     const navigate = useNavigate();
 
-    const refreshCartCount = () => {
-        if (user) {
-            cartAPI.getCart().then((res) => {
+    const refreshCartCount = useCallback(() => {
+        if (!user) return;
+        cartAPI.getCart()
+            .then((res) => {
                 const items = res.data?.items || [];
                 setCartCount(items.length);
-            }).catch(() => setCartCount(0));
-        } else {
-            setCartCount(0);
-        }
-    };
+            })
+            .catch(() => setCartCount(0));
+    }, [user]);
 
     useEffect(() => {
+        if (!user) {
+            const t = setTimeout(() => setCartCount(0), 0);
+            return () => clearTimeout(t);
+        }
         refreshCartCount();
-    }, [user]);
+    }, [user, refreshCartCount]);
 
     useEffect(() => {
         const handler = () => refreshCartCount();
         window.addEventListener('cart-updated', handler);
         return () => window.removeEventListener('cart-updated', handler);
-    }, [user]);
+    }, [refreshCartCount]);
 
     const toggleMenu = () => {
         setIsMenuOpen((prev) => !prev);
@@ -69,8 +72,7 @@ const Header = () => {
                         <nav className='nav'>
                             <Link to='/'>Home</Link>
                             <Link to='/games'>Games</Link>
-                            <Link to='/'>Blog</Link>
-                            <Link to='/'>Forums</Link>
+                            <Link to='/forums'>Forums</Link>
                             <Link to='/contact'>Contact</Link>
                         </nav>
 

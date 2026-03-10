@@ -138,4 +138,24 @@ export const orderAPI = {
   },
 };
 
+// Forums API
+export const forumAPI = {
+  getPosts: async (params = {}) => {
+    const response = await api.get('api/forums/posts', { params });
+    return response.data;
+  },
+  createPost: async ({ title, content }) => {
+    const response = await api.post('api/forums/posts', { title, content });
+    return response.data;
+  },
+  getPostDetail: async (id) => {
+    const response = await api.get(`api/forums/posts/${id}`);
+    return response.data;
+  },
+  addComment: async (postId, text) => {
+    const response = await api.post(`api/forums/posts/${postId}/comments`, { text });
+    return response.data;
+  },
+};
+
 export default api;

@@ -1,0 +1,155 @@
+.forums-page {
+  padding: 32px 0;
+}
+
+.forums-header h1 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.forums-subtitle {
+  opacity: 0.85;
+  margin-bottom: 16px;
+}
+
+.forums-toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 16px 0 20px;
+  flex-wrap: wrap;
+}
+
+.forums-search {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+  min-width: 280px;
+}
+
+.forums-search-input {
+  flex: 1;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.25);
+  color: inherit;
+  border-radius: 10px;
+  padding: 10px 12px;
+  outline: none;
+}
+
+.forums-error {
+  margin: 12px 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255, 72, 72, 0.12);
+  border: 1px solid rgba(255, 72, 72, 0.25);
+}
+
+.forums-section-title {
+  margin: 8px 0 12px;
+}
+
+.forums-create {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.forums-form {
+  display: grid;
+  gap: 10px;
+}
+
+.forums-input,
+.forums-textarea {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.25);
+  color: inherit;
+  border-radius: 12px;
+  padding: 10px 12px;
+  outline: none;
+}
+
+.forums-textarea {
+  resize: vertical;
+}
+
+.forums-form-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.forums-login-hint {
+  opacity: 0.9;
+}
+
+.forums-login-hint a {
+  text-decoration: underline;
+}
+
+.forums-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 900px) {
+  .forums-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+.forums-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 14px;
+  transition: transform 120ms ease, border-color 120ms ease;
+}
+
+.forums-card:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.forums-card-title {
+  font-weight: 700;
+  margin-bottom: 6px;
+  line-height: 1.25;
+}
+
+.forums-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.92rem;
+  opacity: 0.85;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.forums-card-author {
+  font-weight: 600;
+}
+
+.forums-card-dot {
+  opacity: 0.8;
+}
+
+.forums-card-preview {
+  opacity: 0.92;
+  line-height: 1.45;
+}
+
+.forums-empty {
+  opacity: 0.85;
+  padding: 10px 0;
+}

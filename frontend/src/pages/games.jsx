@@ -11,15 +11,6 @@ const Games = () => {
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const featured = searchParams.get('featured') === 'true';
 
-  useEffect(() => {
-    fetchTags();
-  }, []);
-
-  useEffect(() => {
-    setSelectedTag(searchParams.get('tag') || '');
-    setSearchQuery(searchParams.get('search') || '');
-  }, [searchParams]);
-
   const fetchTags = async () => {
     try {
       const response = await gameAPI.getAllTags();
@@ -30,6 +21,21 @@ const Games = () => {
       console.error('Error fetching tags:', error);
     }
   };
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      fetchTags();
+    }, 0);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setSelectedTag(searchParams.get('tag') || '');
+      setSearchQuery(searchParams.get('search') || '');
+    }, 0);
+    return () => clearTimeout(t);
+  }, [searchParams]);
 
   const handleTagClick = (tag) => {
     setSelectedTag(tag === selectedTag ? '' : tag);

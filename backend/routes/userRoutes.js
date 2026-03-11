@@ -1,58 +1,91 @@
-// Thêm vào backend/routes/authRoutes.js (hoặc tạo userRoutes.js)
 import express from "express";
-import bcrypt from "bcryptjs";
 import User from "../models/user.js";
 import { protect } from "../middleware/authMiddleware.js";
 
-const router = express.Router(); // nếu dùng file riêng
+const router = express.Router();
 
-// GET /api/users/profile
+
 router.get("/profile", protect, async (req, res) => {
-  try {
-    const user = await User.findById(req.user._id);
-    res.json({ success: true, user });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
 
-// PUT /api/users/profile — cập nhật thông tin
-router.put("/profile", protect, async (req, res) => {
-  try {
-    const { username, bio, country, avatar } = req.body;
+    try {
 
-    // Kiểm tra username trùng
-    if (username) {
-      const existing = await User.findOne({ username, _id: { $ne: req.user._id } });
-      if (existing) return res.status(400).json({ message: "Username đã tồn tại" });
+        const user = await User.findById(req.user.id);
+
+        res.json(user);
+
+    } catch (error) {
+
+        res.status(500).json({
+            message: "Server error"
+        });
+
     }
 
-    const updated = await User.findByIdAndUpdate(
-      req.user._id,
-      { username, bio, country, avatar },
-      { new: true, runValidators: true }
-    );
+});
+// UPDATE profile
+router.put("/profile", protect, async (req, res) => {
 
-    res.json({ success: true, user: updated });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
+    try {
+
+        const { username, country, bio, avatar } = req.body;
+
+        const user = await User.findByIdAndUpdate(
+            req.user.id,
+            {
+                username,
+                country,
+                bio,
+                avatar
+            },
+            { new: true }
+        );
+
+        res.json(user);
+
+    } catch (error) {
+
+        res.status(500).json({
+            message: "Update failed"
+        });
+
+    }
+
+});
+// CHANGE PASSWORD
+router.put("/change-password", protect, async (req, res) => {
+
+    try {
+
+        const { oldPassword, newPassword } = req.body;
+
+        const user = await User.findById(req.user.id).select("+password");
+
+        const isMatch = await user.comparePassword(oldPassword);
+
+        if (!isMatch) {
+
+            return res.status(400).json({
+                message: "Old password incorrect"
+            });
+
+        }
+
+        user.password = newPassword;
+
+        await user.save();
+
+        res.json({
+            message: "Password updated"
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            message: "Server error"
+        });
+
+    }
+
 });
 
-// PUT /api/users/password — đổi mật khẩu
-router.put("/password", protect, async (req, res) => {
-  try {
-    const { currentPassword, newPassword } = req.body;
-
-    const user = await User.findById(req.user._id).select("+password");
-    const isMatch = await user.comparePassword(currentPassword);
-    if (!isMatch) return res.status(400).json({ message: "Mật khẩu hiện tại không đúng" });
-
-    user.password = newPassword;
-    await user.save(); // pre-save hook sẽ tự hash
-
-    res.json({ success: true, message: "Đổi mật khẩu thành công" });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
+export default router;

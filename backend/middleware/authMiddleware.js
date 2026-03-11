@@ -6,6 +6,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key-change-in-producti
 // Middleware xác thực JWT
 export const protect = async (req, res, next) => {
   try {
+    console.log("AUTH HEADER:", req.headers.authorization);
     let token = req.headers.authorization?.startsWith("Bearer")
       ? req.headers.authorization.split(" ")[1]
       : null;

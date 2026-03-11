@@ -1,0 +1,431 @@
+/* ===== PROFILE PAGE ===== */
+.profile-page {
+  min-height: 100vh;
+  background-color: #1a1c2e;
+  color: #fff;
+}
+
+/* Banner */
+.profile-banner {
+  width: 100%;
+  height: 200px;
+  background: linear-gradient(135deg, #2d6a4f, #52b788, #f4a261);
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-banner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Container chính */
+.profile-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px 40px;
+  display: flex;
+  gap: 24px;
+  margin-top: -40px;
+  position: relative;
+}
+
+/* ===== CỘT TRÁI: info + stats ===== */
+.profile-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.profile-identity {
+  background: #252740;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+}
+
+.profile-avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 12px;
+  border: 3px solid #3d4070;
+  object-fit: cover;
+  margin-bottom: 12px;
+}
+
+.profile-avatar-placeholder {
+  width: 90px;
+  height: 90px;
+  border-radius: 12px;
+  background: #4caf50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin: 0 auto 12px;
+  border: 3px solid #3d4070;
+}
+
+.profile-username {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+.profile-country {
+  color: #888;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.profile-bio {
+  margin-top: 10px;
+  font-size: 0.85rem;
+  color: #aaa;
+  line-height: 1.5;
+}
+
+.btn-edit-profile {
+  margin-top: 14px;
+  width: 100%;
+  padding: 9px 0;
+  background: #2d2f4a;
+  border: 1px solid #444;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background 0.2s;
+}
+
+.btn-edit-profile:hover {
+  background: #3a3d60;
+}
+
+/* Stats box */
+.profile-stats {
+  background: #252740;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.profile-stats h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 16px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stat-icon {
+  font-size: 1.4rem;
+  width: 28px;
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.stat-value {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* ===== CỘT PHẢI: danh sách game ===== */
+.profile-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding-top: 50px;
+}
+
+.profile-header-row h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Tabs */
+.profile-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.tab-btn {
+  padding: 8px 18px;
+  border-radius: 20px;
+  border: none;
+  font-size: 0.9rem;
+  cursor: pointer;
+  background: #2d2f4a;
+  color: #aaa;
+  transition: all 0.2s;
+}
+
+.tab-btn.active {
+  background: #7c3aed;
+  color: #fff;
+}
+
+/* Danh sách game */
+.orders-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+}
+
+.order-card {
+  background: #252740;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform 0.2s;
+  cursor: pointer;
+}
+
+.order-card:hover {
+  transform: translateY(-3px);
+}
+
+.order-card-img {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  background: #1a1c2e;
+}
+
+.order-card-img-placeholder {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: linear-gradient(135deg, #3d4070, #252740);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+}
+
+.order-card-info {
+  padding: 10px;
+}
+
+.order-card-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin: 0 0 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.order-card-price {
+  font-size: 0.8rem;
+  color: #7c3aed;
+  font-weight: 700;
+}
+
+.order-card-date {
+  font-size: 0.72rem;
+  color: #666;
+  margin-top: 2px;
+}
+
+/* Empty state */
+.orders-empty {
+  text-align: center;
+  padding: 80px 20px;
+  color: #666;
+}
+
+.orders-empty .empty-icon {
+  font-size: 3rem;
+  margin-bottom: 12px;
+}
+
+.orders-empty p {
+  font-size: 0.95rem;
+}
+
+/* ===== MODAL EDIT PROFILE ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-box {
+  background: #252740;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 480px;
+  padding: 28px;
+  position: relative;
+}
+
+.modal-box h2 {
+  margin: 0 0 20px;
+  font-size: 1.2rem;
+}
+
+.modal-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #3a3d60;
+  padding-bottom: 12px;
+}
+
+.modal-tab {
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: #888;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.modal-tab.active {
+  background: #7c3aed;
+  color: #fff;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.85rem;
+  color: #aaa;
+  margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 10px 12px;
+  background: #1a1c2e;
+  border: 1px solid #3a3d60;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.9rem;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: #7c3aed;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.btn-cancel {
+  padding: 9px 20px;
+  background: #2d2f4a;
+  border: 1px solid #444;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.btn-save {
+  padding: 9px 20px;
+  background: #7c3aed;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.btn-save:hover {
+  background: #6d28d9;
+}
+
+.btn-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error-msg {
+  color: #ef4444;
+  font-size: 0.82rem;
+  margin-top: 4px;
+}
+
+.success-msg {
+  color: #22c55e;
+  font-size: 0.85rem;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.btn-close-modal {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .profile-container {
+    flex-direction: column;
+    margin-top: 0;
+  }
+  .profile-sidebar {
+    width: 100%;
+  }
+  .profile-header-row {
+    padding-top: 16px;
+  }
+}

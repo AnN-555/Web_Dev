@@ -3,6 +3,11 @@ import { useAuth } from "../context/AuthContext";
 import { userAPI } from "../services/api";
 import "./profile.css";
 
+
+
+
+
+
 const Profile = () => {
   const { user } = useAuth();
 

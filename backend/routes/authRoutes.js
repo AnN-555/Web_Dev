@@ -7,7 +7,12 @@ import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// Multer dùng memory storage (không lưu file xuống disk)
+const generateToken = (id) => {
+  const secret = process.env.JWT_SECRET || "your-secret-key-change-in-production";
+  const expiresIn = process.env.JWT_EXPIRES_IN || "7d";
+  return jwt.sign({ id }, secret, { expiresIn });
+};
+
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
@@ -17,37 +22,20 @@ const upload = multer({
   },
 });
 
-// Tạo JWT token
-const generateToken = (id) => {
-  const secret = process.env.JWT_SECRET || "your-secret-key-change-in-production";
-  const expiresIn = process.env.JWT_EXPIRES_IN || "7d";
-  return jwt.sign({ id }, secret, { expiresIn });
-};
-
-// ============================
-// REGISTER
-// ============================
-// @route POST /api/auth/register
 router.post("/register", async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
     if (!username || !email || !password) {
-      return res.status(400).json({
-        message: "Please enter username, email, and password.",
-      });
+      return res.status(400).json({ message: "Please enter username, email, and password." });
     }
 
-    const existingUser = await User.findOne({
-      $or: [{ email }, { username }],
-    });
-
+    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
     if (existingUser) {
       return res.status(400).json({
-        message:
-          existingUser.email === email
-            ? "Email has already been used."
-            : "Username has already been used.",
+        message: existingUser.email === email
+          ? "Email has already been used."
+          : "Username has already been used.",
       });
     }
 
@@ -57,73 +45,66 @@ router.post("/register", async (req, res) => {
     res.status(201).json({
       message: "Registration successful",
       token,
-      user: {
-        id: user._id,
-        username: user.username,
-        email: user.email,
-      },
+      user: { id: user._id, username: user.username, email: user.email },
     });
   } catch (error) {
     console.error("Register error:", error);
-
     if (error.name === "ValidationError") {
       const messages = Object.values(error.errors).map((e) => e.message);
       return res.status(400).json({ message: messages.join(", ") });
     }
-
     if (error.code === 11000) {
       const field = Object.keys(error.keyPattern || {})[0] || "field";
       return res.status(400).json({
-        message:
-          field === "email"
-            ? "Email has already been used."
-            : "Username has already been used.",
+        message: field === "email" ? "Email has already been used." : "Username has already been used.",
       });
     }
-
     res.status(500).json({ message: "Server error" });
   }
 });
 
-// ============================
-// LOGIN
-// ============================
-// @route POST /api/auth/login
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({
-        message: "Please enter email and password.",
-      });
+      return res.status(400).json({ message: "Please enter email and password." });
     }
 
     const user = await User.findOne({ email }).select("+password");
-
-    if (!user) {
-      return res.status(401).json({
-        message: "Email or password is incorrect",
-      });
-    }
+    if (!user) return res.status(401).json({ message: "Email or password is incorrect" });
 
     const isMatch = await user.comparePassword(password);
-
-    if (!isMatch) {
-      return res.status(401).json({
-        message: "Email or password is incorrect",
-      });
-    }
+    if (!isMatch) return res.status(401).json({ message: "Email or password is incorrect" });
 
     const token = generateToken(user._id);
 
     res.json({
       message: "Login successful",
       token,
+      user: { id: user._id, username: user.username, email: user.email },
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.post("/logout", protect, (req, res) => {
+  res.json({ message: "Logout successful" });
+});
+
+router.get("/me", protect, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    res.json({
       user: {
         id: user._id,
         username: user.username,
         email: user.email,
+        avatar: user.avatar,
+        country: user.country,
+        bio: user.bio,
+        createdAt: user.createdAt,
       },
     });
   } catch (error) {
@@ -131,37 +112,13 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// ============================
-// LOGOUT
-// ============================
-// @route POST /api/auth/logout
-router.post("/logout", protect, (req, res) => {
-  res.json({ message: "Logout successful" });
-});
 
-// ============================
-// GET CURRENT USER
-// ============================
-// @route GET /api/auth/me
-router.get("/me", protect, (req, res) => {
-  res.json({
-    user: {
-      id: req.user._id,
-      username: req.user.username,
-      email: req.user.email,
-    },
-  });
-});
-
-// ============================
-// UPLOAD AVATAR
-// ============================
-// @route POST /api/auth/upload-avatar
 router.post("/upload-avatar", protect, upload.single("avatar"), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: "Không có file ảnh" });
     }
+
 
     const result = await new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
@@ -174,7 +131,6 @@ router.post("/upload-avatar", protect, upload.single("avatar"), async (req, res)
           else resolve(result);
         }
       );
-
       stream.end(req.file.buffer);
     });
 
@@ -189,8 +145,8 @@ router.post("/upload-avatar", protect, upload.single("avatar"), async (req, res)
       avatarUrl: result.secure_url,
       user,
     });
-
   } catch (error) {
+    console.error("Upload avatar error:", error);
     res.status(500).json({ message: error.message });
   }
 });

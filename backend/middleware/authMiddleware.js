@@ -1,6 +1,5 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
-
 export const protect = async (req, res, next) => {
   try {
     let token = req.headers.authorization?.startsWith("Bearer")
@@ -10,8 +9,6 @@ export const protect = async (req, res, next) => {
     if (!token) {
       return res.status(401).json({ message: "Not authorized, no token" });
     }
-
-    // ✅ Đọc JWT_SECRET bên trong function, không phải module level
     const secret = process.env.JWT_SECRET || "your-secret-key-change-in-production";
     const decoded = jwt.verify(token, secret);
 
@@ -23,7 +20,7 @@ export const protect = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
-    console.log("JWT verify error:", error.message); // xem terminal để debug
+    console.log("JWT Error:", error.message);
     return res.status(401).json({ message: "Not authorized, token invalid" });
   }
 };

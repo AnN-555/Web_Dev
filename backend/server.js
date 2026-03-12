@@ -1,6 +1,7 @@
+import './config/env.js'; 
+
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import connectDB from './config/database.js';
@@ -9,8 +10,6 @@ import authRoutes from './routes/authRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import userRoutes from "./routes/userRoutes.js";
-
-dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,7 +20,6 @@ const PORT = process.env.PORT || 8000;
 app.use(cors());
 app.use(express.json());
 
-// Serve static files from database folder
 app.use('/database', express.static(path.join(__dirname, '../database')));
 
 // Routes
@@ -31,12 +29,10 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use("/api/users", userRoutes);
 
-// Health check
 app.get('/', (req, res) => {
   res.json({ message: 'GameStore API is running' });
 });
 
-// Chỉ lắng nghe sau khi đã kết nối MongoDB
 const start = async () => {
   try {
     await connectDB();

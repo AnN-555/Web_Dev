@@ -1,14 +1,20 @@
-// frontend/src/pages/profile.jsx
+
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
-import Header from "../components/header";
 import "./profile.css";
 
-/* ─────────────────────────────────────────
-   MODAL EDIT PROFILE
-───────────────────────────────────────── */
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+const IMAGE_BASE_URL = API_BASE_URL.replace(/\/api\/?$/, "");
+
+const getImageUrl = (url) => {
+  if (!url) return null;
+  if (url.startsWith("http")) return url;
+  if (url.startsWith("/database/")) return `${IMAGE_BASE_URL}${url}`;
+  return `${IMAGE_BASE_URL}/database/${url}`;
+};
+
 function EditProfileModal({ user, onClose, onSaved }) {
   const [tab, setTab] = useState("info");
   const [form, setForm] = useState({
@@ -20,13 +26,12 @@ function EditProfileModal({ user, onClose, onSaved }) {
     oldPassword: "", newPassword: "", confirmPassword: "",
   });
   const [loading, setLoading] = useState(false);
-  const [msg, setMsg]         = useState({ type: "", text: "" });
+  const [msg, setMsg] = useState({ type: "", text: "" });
 
   const setSuccess = (t) => setMsg({ type: "success", text: t });
   const setError   = (t) => setMsg({ type: "error",   text: t });
   const clearMsg   = ()  => setMsg({ type: "", text: "" });
 
-  /* ── Cập nhật thông tin ── */
   const handleInfoSave = async () => {
     clearMsg(); setLoading(true);
     try {
@@ -38,7 +43,6 @@ function EditProfileModal({ user, onClose, onSaved }) {
     } finally { setLoading(false); }
   };
 
-  /* ── Đổi mật khẩu ── */
   const handlePwSave = async () => {
     clearMsg();
     if (pw.newPassword !== pw.confirmPassword)
@@ -64,7 +68,7 @@ function EditProfileModal({ user, onClose, onSaved }) {
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="modal-box">
         <button className="modal-close" onClick={onClose}>✕</button>
-        <h2>✏️ Chỉnh sửa Profile</h2>
+        <h2>Chỉnh sửa Profile</h2>
 
         <div className="modal-tabs">
           <button className={`modal-tab ${tab === "info" ? "active" : ""}`}
@@ -77,19 +81,27 @@ function EditProfileModal({ user, onClose, onSaved }) {
           <>
             <div className="form-group">
               <label>Username</label>
-              <input value={form.username}
-                onChange={e => setForm({ ...form, username: e.target.value })} />
+              <input
+                value={form.username}
+                onChange={e => setForm({ ...form, username: e.target.value })}
+                placeholder="Tên hiển thị"
+              />
             </div>
             <div className="form-group">
               <label>Quốc gia</label>
-              <input value={form.country}
-                onChange={e => setForm({ ...form, country: e.target.value })} />
+              <input
+                value={form.country}
+                onChange={e => setForm({ ...form, country: e.target.value })}
+                placeholder="Vietnam"
+              />
             </div>
             <div className="form-group">
               <label>Bio</label>
-              <textarea value={form.bio}
+              <textarea
+                value={form.bio}
                 onChange={e => setForm({ ...form, bio: e.target.value })}
-                placeholder="Mô tả ngắn về bạn..." />
+                placeholder="Mô tả ngắn về bạn..."
+              />
             </div>
           </>
         )}
@@ -131,22 +143,18 @@ function EditProfileModal({ user, onClose, onSaved }) {
   );
 }
 
-/* ─────────────────────────────────────────
-   TRANG PROFILE
-───────────────────────────────────────── */
 export default function ProfilePage() {
   const { user: authUser, setUser } = useAuth();
   const navigate  = useNavigate();
   const avatarRef = useRef(null);
 
-  const [profile,    setProfile]    = useState(null);
-  const [orders,     setOrders]     = useState([]);
-  const [loading,    setLoading]    = useState(true);
-  const [showModal,  setShowModal]  = useState(false);
+  const [profile,         setProfile]         = useState(null);
+  const [orders,          setOrders]          = useState([]);
+  const [loading,         setLoading]         = useState(true);
+  const [showModal,       setShowModal]       = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
-  const [copied,     setCopied]     = useState(false);
+  const [copied,          setCopied]          = useState(false);
 
-  /* ── Fetch data ── */
   useEffect(() => {
     if (!authUser) { navigate("/login"); return; }
     (async () => {
@@ -155,7 +163,7 @@ export default function ProfilePage() {
           api.get("/users/profile"),
           api.get("/orders"),
         ]);
-        setProfile(pRes.data);
+        setProfile(pRes.data.user);
         setOrders(oRes.data.data || []);
       } catch (e) {
         console.error(e);
@@ -163,7 +171,6 @@ export default function ProfilePage() {
     })();
   }, [authUser]);
 
-  /* ── Upload avatar ── */
   const handleAvatarChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -176,56 +183,65 @@ export default function ProfilePage() {
       });
       const updated = { ...profile, avatar: res.data.avatarUrl };
       setProfile(updated);
-      if (setUser) setUser(updated);
+      if (setUser) setUser(prev => ({ ...prev, avatar: res.data.avatarUrl }));
     } catch (e) {
-      alert("Upload avatar thất bại: " + (e.response?.data?.message || e.message));
-    } finally { setAvatarUploading(false); }
+      alert("Upload thất bại: " + (e.response?.data?.message || e.message));
+    } finally {
+      setAvatarUploading(false);
+      if (avatarRef.current) avatarRef.current.value = "";
+    }
   };
 
-  /* ── Sau khi save edit profile ── */
   const handleSaved = (updatedUser) => {
     setProfile(updatedUser);
-    if (setUser) setUser(updatedUser);
+    if (setUser) setUser(prev => ({ ...prev, ...updatedUser }));
   };
 
-  /* ── Share profile ── */
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
-  /* ── Helpers ── */
   const memberDays = profile
     ? Math.floor((Date.now() - new Date(profile.createdAt)) / 86400000)
     : 0;
 
   const fmtDate = (d) =>
-    new Date(d).toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric" });
+    new Date(d).toLocaleDateString("vi-VN", {
+      day: "2-digit", month: "2-digit", year: "numeric",
+    });
 
   if (loading) return (
-    <div className="profile-loading">
-      <Header />
-      <span>⏳ Đang tải...</span>
-    </div>
+    <div className="profile-loading">⏳ Đang tải...</div>
   );
 
   return (
     <div className="profile-page">
-      <Header />
 
-      {/* ── Banner ── */}
       <div className="profile-banner" />
 
-      {/* ── Avatar + tên + buttons ── */}
       <div className="profile-identity-row">
 
-        {/* Avatar với nút camera */}
         <div className="profile-avatar-wrap">
-          {profile?.avatar
-            ? <img src={profile.avatar} alt="avatar" className="profile-avatar" />
-            : <div className="profile-avatar-placeholder">🐱</div>
-          }
+          <img
+            src={getImageUrl(profile?.avatar)}
+            alt="avatar"
+            className="profile-avatar"
+            style={{ display: profile?.avatar ? "block" : "none" }}
+            onError={e => {
+              e.target.onerror = null;
+              e.target.style.display = "none";
+              e.target.nextSibling.style.display = "flex";
+            }}
+          />
+          <div
+            className="profile-avatar-placeholder"
+            style={{ display: profile?.avatar ? "none" : "flex" }}
+          >
+            🐱
+          </div>
+
           <label className="avatar-upload-btn" title="Đổi ảnh đại diện">
             {avatarUploading ? "⏳" : "📷"}
             <input
@@ -237,30 +253,24 @@ export default function ProfilePage() {
           </label>
         </div>
 
-        {/* Tên + country */}
         <div className="profile-name-block">
           <h1 className="profile-username">{profile?.username}</h1>
           <p className="profile-country">📍 {profile?.country || "Vietnam"}</p>
           {profile?.bio && (
-            <p style={{ fontSize: "0.82rem", color: "#aaa", marginTop: 4 }}>{profile.bio}</p>
+            <p className="profile-bio">{profile.bio}</p>
           )}
         </div>
 
-        {/* Action buttons */}
         <div className="profile-action-btns">
           <button className="btn-edit-profile" onClick={() => setShowModal(true)}>
             ✏️ <span>Edit profile</span>
           </button>
           <button className="btn-share-profile" onClick={handleShare}>
-            🔗 <span>{copied ? "Đã copy!" : "Share profile"}</span>
+            🔗 <span>{copied ? "Đã copy!" : "Share"}</span>
           </button>
         </div>
       </div>
-
-      {/* ── Body: sidebar + main ── */}
       <div className="profile-body">
-
-        {/* Sidebar */}
         <aside className="profile-sidebar">
           <div className="sidebar-card">
             <h3>Friends</h3>
@@ -300,7 +310,6 @@ export default function ProfilePage() {
           </div>
         </aside>
 
-        {/* Main */}
         <main className="profile-main">
           <div className="profile-tabs">
             <button className="tab-btn active">🎮 Games đã mua</button>
@@ -317,18 +326,37 @@ export default function ProfilePage() {
           ) : (
             <div className="orders-grid">
               {orders.map(order => (
-                <div key={order._id} className="order-card"
-                  onClick={() => navigate(`/games/${order.game?.slug}`)}>
-                  {order.game?.headerImage
-                    ? <img src={order.game.headerImage} alt={order.game.name} className="order-card-thumb" />
-                    : <div className="order-card-thumb-placeholder">🎮</div>
-                  }
+                <div
+                  key={order._id}
+                  className="order-card"
+                  onClick={() => navigate(`/games/${order.game?.slug}`)}
+                >
+                  {/* Ảnh game */}
+                  <img
+                    src={getImageUrl(order.game?.headerImage)}
+                    alt={order.game?.name || "game"}
+                    className="order-card-thumb"
+                    onError={e => {
+                      e.target.onerror = null;
+                      e.target.style.display = "none";
+                      e.target.nextSibling.style.display = "flex";
+                    }}
+                  />
+                  <div className="order-card-thumb-placeholder">🎮</div>
+
+                  {/* Thông tin game */}
                   <div className="order-card-body">
-                    <p className="order-card-name">{order.game?.name || "Game đã bị xoá"}</p>
-                    <p className="order-card-price">
-                      {order.priceAtPurchase === 0 ? "Free" : `${order.priceAtPurchase.toLocaleString()}đ`}
+                    <p className="order-card-name">
+                      {order.game?.name || "Game đã bị xoá"}
                     </p>
-                    <p className="order-card-date">{fmtDate(order.createdAt)}</p>
+                    <p className="order-card-price">
+                      {order.priceAtPurchase === 0
+                        ? "🆓 Free"
+                        : `💰 ${order.priceAtPurchase.toLocaleString("vi-VN")}đ`}
+                    </p>
+                    <p className="order-card-date">
+                      🗓 {fmtDate(order.createdAt)}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -337,7 +365,6 @@ export default function ProfilePage() {
         </main>
       </div>
 
-      {/* Modal */}
       {showModal && (
         <EditProfileModal
           user={profile}

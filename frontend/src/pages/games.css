@@ -16,7 +16,7 @@
 }
 
 .games-header h1 i {
-  color: #667eea;
+  color: #e85d04;
 }
 
 .search-form {
@@ -96,13 +96,13 @@
 }
 
 .tag-filter:hover {
-  border-color: #667eea;
+  border-color: #e85d04;
   transform: translateY(-2px);
 }
 
 .tag-filter.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-color: #667eea;
+  background: (135deg, #ff6b35 0%, #815343 100%);
+  border-color: #e85d04;
 }
 
 @media (max-width: 768px) {

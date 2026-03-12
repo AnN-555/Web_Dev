@@ -78,7 +78,7 @@ const Forums = () => {
           <h1>
             <i className="fas fa-comments" /> Forums
           </h1>
-          <p className="forums-subtitle">Nơi thảo luận — xem tự do, đăng bài & bình luận khi đã đăng nhập.</p>
+          <p className="forums-subtitle">Discussion forum — view freely, post, and comment when logged in.</p>
         </div>
 
         <div className="forums-toolbar">
@@ -88,7 +88,7 @@ const Forums = () => {
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               className="forums-search-input"
-              placeholder="Tìm theo tiêu đề / nội dung..."
+              placeholder="Search by title / content..."
             />
             <button type="button" className="btn btn-secondary" onClick={handleSearch} disabled={loading}>
               Search
@@ -106,45 +106,45 @@ const Forums = () => {
         )}
 
         <section className="forums-create">
-          <h2 className="forums-section-title">Đăng bài thảo luận</h2>
+          <h2 className="forums-section-title">Create Discussion Post</h2>
           {isAuthenticated ? (
             <form className="forums-form" onSubmit={handleCreate}>
               <input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 className="forums-input"
-                placeholder="Tiêu đề (3–120 ký tự)"
+                placeholder="Title (3–120 characters)"
                 maxLength={120}
               />
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 className="forums-textarea"
-                placeholder="Nội dung (3–5000 ký tự)"
+                placeholder="Content (3–5000 characters)"
                 rows={5}
                 maxLength={5000}
               />
               <div className="forums-form-actions">
                 <button type="submit" className="btn" disabled={!canCreate}>
-                  {creating ? 'Đang đăng...' : 'Đăng bài'}
+                  {creating ? 'Creating...' : 'Create Post'}
                 </button>
               </div>
             </form>
           ) : (
             <div className="forums-login-hint">
-              Bạn chưa đăng nhập. <Link to="/login">Đăng nhập</Link> để đăng bài.
+              You are not logged in. <Link to="/login">Log in</Link> to create a post.
             </div>
           )}
         </section>
 
         <section className="forums-list">
-          <h2 className="forums-section-title">Bài thảo luận</h2>
+          <h2 className="forums-section-title">Discussion</h2>
           {loading ? (
             <div className="loading">
               <div className="spinner" />
             </div>
           ) : posts.length === 0 ? (
-            <div className="forums-empty">Chưa có bài thảo luận nào.</div>
+            <div className="forums-empty">No discussion posts yet.</div>
           ) : (
             <div className="forums-cards">
               {posts.map((p) => (

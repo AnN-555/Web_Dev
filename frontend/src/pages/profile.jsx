@@ -19,8 +19,8 @@ function EditProfileModal({ user, onClose, onSaved }) {
   const [tab, setTab] = useState("info");
   const [form, setForm] = useState({
     username: user?.username || "",
-    country:  user?.country  || "Vietnam",
-    bio:      user?.bio      || "",
+    country: user?.country || "Vietnam",
+    bio: user?.bio || "",
   });
   const [pw, setPw] = useState({
     oldPassword: "", newPassword: "", confirmPassword: "",
@@ -29,36 +29,36 @@ function EditProfileModal({ user, onClose, onSaved }) {
   const [msg, setMsg] = useState({ type: "", text: "" });
 
   const setSuccess = (t) => setMsg({ type: "success", text: t });
-  const setError   = (t) => setMsg({ type: "error",   text: t });
-  const clearMsg   = ()  => setMsg({ type: "", text: "" });
+  const setError = (t) => setMsg({ type: "error", text: t });
+  const clearMsg = () => setMsg({ type: "", text: "" });
 
   const handleInfoSave = async () => {
     clearMsg(); setLoading(true);
     try {
       const res = await api.put("/users/profile", form);
-      setSuccess("Cập nhật thành công!");
+      setSuccess("Profile updated successfully!");
       onSaved(res.data.user);
     } catch (e) {
-      setError(e.response?.data?.message || "Có lỗi xảy ra");
+      setError(e.response?.data?.message || "Error updating profile");
     } finally { setLoading(false); }
   };
 
   const handlePwSave = async () => {
     clearMsg();
     if (pw.newPassword !== pw.confirmPassword)
-      return setError("Mật khẩu mới không khớp");
+      return setError("Password is not matched!");
     if (pw.newPassword.length < 6)
-      return setError("Mật khẩu mới tối thiểu 6 ký tự");
+      return setError("New password must be at least 6 characters!");
     setLoading(true);
     try {
       await api.put("/users/change-password", {
         oldPassword: pw.oldPassword,
         newPassword: pw.newPassword,
       });
-      setSuccess("Đổi mật khẩu thành công!");
+      setSuccess("Password is changed!");
       setPw({ oldPassword: "", newPassword: "", confirmPassword: "" });
     } catch (e) {
-      setError(e.response?.data?.message || "Mật khẩu hiện tại không đúng");
+      setError(e.response?.data?.message || "Current password is incorrect");
     } finally { setLoading(false); }
   };
 
@@ -72,9 +72,9 @@ function EditProfileModal({ user, onClose, onSaved }) {
 
         <div className="modal-tabs">
           <button className={`modal-tab ${tab === "info" ? "active" : ""}`}
-            onClick={() => switchTab("info")}>Thông tin</button>
+            onClick={() => switchTab("info")}>Information</button>
           <button className={`modal-tab ${tab === "password" ? "active" : ""}`}
-            onClick={() => switchTab("password")}>Đổi mật khẩu</button>
+            onClick={() => switchTab("password")}>Change Password</button>
         </div>
 
         {tab === "info" && (
@@ -84,11 +84,11 @@ function EditProfileModal({ user, onClose, onSaved }) {
               <input
                 value={form.username}
                 onChange={e => setForm({ ...form, username: e.target.value })}
-                placeholder="Tên hiển thị"
+                placeholder="User name"
               />
             </div>
             <div className="form-group">
-              <label>Quốc gia</label>
+              <label>Country</label>
               <input
                 value={form.country}
                 onChange={e => setForm({ ...form, country: e.target.value })}
@@ -100,7 +100,7 @@ function EditProfileModal({ user, onClose, onSaved }) {
               <textarea
                 value={form.bio}
                 onChange={e => setForm({ ...form, bio: e.target.value })}
-                placeholder="Mô tả ngắn về bạn..."
+                placeholder="Your short bio..."
               />
             </div>
           </>
@@ -109,17 +109,17 @@ function EditProfileModal({ user, onClose, onSaved }) {
         {tab === "password" && (
           <>
             <div className="form-group">
-              <label>Mật khẩu hiện tại</label>
+              <label>Current Password</label>
               <input type="password" value={pw.oldPassword}
                 onChange={e => setPw({ ...pw, oldPassword: e.target.value })} />
             </div>
             <div className="form-group">
-              <label>Mật khẩu mới</label>
+              <label>New Password</label>
               <input type="password" value={pw.newPassword}
                 onChange={e => setPw({ ...pw, newPassword: e.target.value })} />
             </div>
             <div className="form-group">
-              <label>Xác nhận mật khẩu mới</label>
+              <label>Confirm New Password</label>
               <input type="password" value={pw.confirmPassword}
                 onChange={e => setPw({ ...pw, confirmPassword: e.target.value })} />
             </div>
@@ -131,10 +131,10 @@ function EditProfileModal({ user, onClose, onSaved }) {
             {msg.text}
           </span>
           <div className="modal-actions">
-            <button className="btn-cancel" onClick={onClose}>Huỷ</button>
+            <button className="btn-cancel" onClick={onClose}>Cancel</button>
             <button className="btn-save" disabled={loading}
               onClick={tab === "info" ? handleInfoSave : handlePwSave}>
-              {loading ? "Đang lưu..." : "Lưu"}
+              {loading ? "Saving..." : "Save"}
             </button>
           </div>
         </div>
@@ -145,15 +145,15 @@ function EditProfileModal({ user, onClose, onSaved }) {
 
 export default function ProfilePage() {
   const { user: authUser, setUser } = useAuth();
-  const navigate  = useNavigate();
+  const navigate = useNavigate();
   const avatarRef = useRef(null);
 
-  const [profile,         setProfile]         = useState(null);
-  const [orders,          setOrders]          = useState([]);
-  const [loading,         setLoading]         = useState(true);
-  const [showModal,       setShowModal]       = useState(false);
+  const [profile, setProfile] = useState(null);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
-  const [copied,          setCopied]          = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!authUser) { navigate("/login"); return; }
@@ -185,7 +185,7 @@ export default function ProfilePage() {
       setProfile(updated);
       if (setUser) setUser(prev => ({ ...prev, avatar: res.data.avatarUrl }));
     } catch (e) {
-      alert("Upload thất bại: " + (e.response?.data?.message || e.message));
+      alert("Upload failed: " + (e.response?.data?.message || e.message));
     } finally {
       setAvatarUploading(false);
       if (avatarRef.current) avatarRef.current.value = "";
@@ -213,7 +213,7 @@ export default function ProfilePage() {
     });
 
   if (loading) return (
-    <div className="profile-loading">⏳ Đang tải...</div>
+    <div className="profile-loading">⏳ Loading...</div>
   );
 
   return (
@@ -242,7 +242,7 @@ export default function ProfilePage() {
             🐱
           </div>
 
-          <label className="avatar-upload-btn" title="Đổi ảnh đại diện">
+          <label className="avatar-upload-btn" title="Change avatar">
             {avatarUploading ? "⏳" : "📷"}
             <input
               type="file"
@@ -266,7 +266,7 @@ export default function ProfilePage() {
             ✏️ <span>Edit profile</span>
           </button>
           <button className="btn-share-profile" onClick={handleShare}>
-            🔗 <span>{copied ? "Đã copy!" : "Share"}</span>
+            🔗 <span>{copied ? "Is copied!" : "Share"}</span>
           </button>
         </div>
       </div>
@@ -294,17 +294,10 @@ export default function ProfilePage() {
               </div>
             </div>
             <div className="stat-row">
-              <div className="stat-icon-wrap">👍</div>
-              <div>
-                <div className="stat-label">Games liked</div>
-                <div className="stat-value">0</div>
-              </div>
-            </div>
-            <div className="stat-row">
               <div className="stat-icon-wrap">🔥</div>
               <div>
                 <div className="stat-label">Playstreak</div>
-                <div className="stat-value">1 day</div>
+                <div className="stat-value">_ _</div>
               </div>
             </div>
           </div>
@@ -312,15 +305,15 @@ export default function ProfilePage() {
 
         <main className="profile-main">
           <div className="profile-tabs">
-            <button className="tab-btn active">🎮 Games đã mua</button>
+            <button className="tab-btn active">🎮 Bought games </button>
           </div>
 
           {orders.length === 0 ? (
             <div className="orders-empty">
               <div className="empty-icon">🛒</div>
-              <p>Bạn chưa mua game nào</p>
+              <p>You haven't bought any games yet.</p>
               <button className="btn-browse" onClick={() => navigate("/games")}>
-                Khám phá Games
+                Explore more games
               </button>
             </div>
           ) : (
@@ -331,7 +324,6 @@ export default function ProfilePage() {
                   className="order-card"
                   onClick={() => navigate(`/games/${order.game?.slug}`)}
                 >
-                  {/* Ảnh game */}
                   <img
                     src={getImageUrl(order.game?.headerImage)}
                     alt={order.game?.name || "game"}
@@ -343,11 +335,9 @@ export default function ProfilePage() {
                     }}
                   />
                   <div className="order-card-thumb-placeholder">🎮</div>
-
-                  {/* Thông tin game */}
                   <div className="order-card-body">
                     <p className="order-card-name">
-                      {order.game?.name || "Game đã bị xoá"}
+                      {order.game?.name || "Game is deleted!"}
                     </p>
                     <p className="order-card-price">
                       {order.priceAtPurchase === 0

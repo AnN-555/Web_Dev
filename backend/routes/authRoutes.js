@@ -118,8 +118,6 @@ router.post("/upload-avatar", protect, upload.single("avatar"), async (req, res)
     if (!req.file) {
       return res.status(400).json({ message: "Không có file ảnh" });
     }
-
-
     const result = await new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
         {

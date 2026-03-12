@@ -10,7 +10,6 @@ const userSchema = new mongoose.Schema(
       unique: true,
       minlength: [3, "Username must be at least 3 characters"],
     },
-
     email: {
       type: String,
       required: [true, "Email is required"],
@@ -19,40 +18,29 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       match: [/^\S+@\S+\.\S+$/, "Please enter a valid email"],
     },
-
     password: {
       type: String,
       required: [true, "Password is required"],
       minlength: [6, "Password must be at least 6 characters"],
       select: false,
     },
-
-    // Avatar profile
     avatar: {
       type: String,
       default: ""
     },
-
-    // Quốc gia
     country: {
       type: String,
       default: "Vietnam"
     },
-
-    // Mô tả ngắn profile
     bio: {
       type: String,
       maxlength: 200,
       default: ""
     }
-
   },
   { timestamps: true }
 );
 
-
-
-// Hash password trước khi save
 userSchema.pre("save", async function () {
 
   if (!this.isModified("password")) return;
@@ -61,12 +49,9 @@ userSchema.pre("save", async function () {
 
 });
 
-
-// So sánh password
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
-
 
 const User = mongoose.model("User", userSchema);
 

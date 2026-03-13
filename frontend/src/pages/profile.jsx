@@ -40,29 +40,29 @@ function EditProfileModal({ user, onClose, onSaved }) {
     try {
       // api instance có baseURL rồi, chỉ cần path /api/users/profile
       const res = await api.put("/api/users/profile", form);
-      setSuccess("Cập nhật thành công!");
+      setSuccess("Update success!");
       onSaved(res.data.user);
     } catch (e) {
-      setError(e.response?.data?.message || "Có lỗi xảy ra");
+      setError(e.response?.data?.message || "Error");
     } finally { setLoading(false); }
   };
 
   const handlePwSave = async () => {
     clearMsg();
     if (pw.newPassword !== pw.confirmPassword)
-      return setError("Mật khẩu mới không khớp");
+      return setError("New password is not matched");
     if (pw.newPassword.length < 6)
-      return setError("Mật khẩu mới tối thiểu 6 ký tự");
+      return setError("Password has to be at least 6 characters");
     setLoading(true);
     try {
       await api.put("/api/users/change-password", {
         oldPassword: pw.oldPassword,
         newPassword: pw.newPassword,
       });
-      setSuccess("Đổi mật khẩu thành công!");
+      setSuccess("Password has been changed!");
       setPw({ oldPassword: "", newPassword: "", confirmPassword: "" });
     } catch (e) {
-      setError(e.response?.data?.message || "Mật khẩu hiện tại không đúng");
+      setError(e.response?.data?.message || "Current password is not correct");
     } finally { setLoading(false); }
   };
 
@@ -72,13 +72,13 @@ function EditProfileModal({ user, onClose, onSaved }) {
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="modal-box">
         <button className="modal-close" onClick={onClose}>✕</button>
-        <h2>Chỉnh sửa Profile</h2>
+        <h2>Adjust profile</h2>
 
         <div className="modal-tabs">
           <button className={`modal-tab ${tab === "info" ? "active" : ""}`}
-            onClick={() => switchTab("info")}>Thông tin</button>
+            onClick={() => switchTab("info")}>Info</button>
           <button className={`modal-tab ${tab === "password" ? "active" : ""}`}
-            onClick={() => switchTab("password")}>Đổi mật khẩu</button>
+            onClick={() => switchTab("password")}>Change password</button>
         </div>
 
         {tab === "info" && (
@@ -87,10 +87,10 @@ function EditProfileModal({ user, onClose, onSaved }) {
               <label>Username</label>
               <input value={form.username}
                 onChange={e => setForm({ ...form, username: e.target.value })}
-                placeholder="Tên hiển thị" />
+                placeholder="Display username" />
             </div>
             <div className="form-group">
-              <label>Quốc gia</label>
+              <label>Country</label>
               <input value={form.country}
                 onChange={e => setForm({ ...form, country: e.target.value })}
                 placeholder="Vietnam" />
@@ -99,7 +99,7 @@ function EditProfileModal({ user, onClose, onSaved }) {
               <label>Bio</label>
               <textarea value={form.bio}
                 onChange={e => setForm({ ...form, bio: e.target.value })}
-                placeholder="Mô tả ngắn về bạn..." />
+                placeholder="Short bio..." />
             </div>
           </>
         )}
@@ -107,17 +107,17 @@ function EditProfileModal({ user, onClose, onSaved }) {
         {tab === "password" && (
           <>
             <div className="form-group">
-              <label>Mật khẩu hiện tại</label>
+              <label>Current password</label>
               <input type="password" value={pw.oldPassword}
                 onChange={e => setPw({ ...pw, oldPassword: e.target.value })} />
             </div>
             <div className="form-group">
-              <label>Mật khẩu mới</label>
+              <label>New password</label>
               <input type="password" value={pw.newPassword}
                 onChange={e => setPw({ ...pw, newPassword: e.target.value })} />
             </div>
             <div className="form-group">
-              <label>Xác nhận mật khẩu mới</label>
+              <label>Confirm new password</label>
               <input type="password" value={pw.confirmPassword}
                 onChange={e => setPw({ ...pw, confirmPassword: e.target.value })} />
             </div>
@@ -129,10 +129,10 @@ function EditProfileModal({ user, onClose, onSaved }) {
             {msg.text}
           </span>
           <div className="modal-actions">
-            <button className="btn-cancel" onClick={onClose}>Huỷ</button>
+            <button className="btn-cancel" onClick={onClose}>Cancel</button>
             <button className="btn-save" disabled={loading}
               onClick={tab === "info" ? handleInfoSave : handlePwSave}>
-              {loading ? "Đang lưu..." : "Lưu"}
+              {loading ? "Saving..." : "Saved"}
             </button>
           </div>
         </div>
@@ -216,7 +216,7 @@ export default function ProfilePage() {
       day: "2-digit", month: "2-digit", year: "numeric",
     });
 
-  if (loading) return <div className="profile-loading">⏳ Đang tải...</div>;
+  if (loading) return <div className="profile-loading">⏳ Loading...</div>;
 
   return (
     <div className="profile-page">
@@ -239,7 +239,7 @@ export default function ProfilePage() {
             style={{ display: profile?.avatar ? "none" : "flex" }}>
             🐱
           </div>
-          <label className="avatar-upload-btn" title="Đổi ảnh đại diện">
+          <label className="avatar-upload-btn" title="Change avatar">
             {avatarUploading ? "⏳" : "📷"}
             <input type="file" accept="image/*" ref={avatarRef} onChange={handleAvatarChange} />
           </label>
@@ -265,7 +265,7 @@ export default function ProfilePage() {
         <aside className="profile-sidebar">
           <div className="sidebar-card">
             <h3>Friends</h3>
-            <p className="friends-count">0 friends</p>
+            <p className="friends-count">...</p>
           </div>
           <div className="sidebar-card">
             <h3>Stats</h3>
@@ -287,14 +287,14 @@ export default function ProfilePage() {
               <div className="stat-icon-wrap">👍</div>
               <div>
                 <div className="stat-label">Games liked</div>
-                <div className="stat-value">0</div>
+                <div className="stat-value">...</div>
               </div>
             </div>
             <div className="stat-row">
               <div className="stat-icon-wrap">🔥</div>
               <div>
                 <div className="stat-label">Playstreak</div>
-                <div className="stat-value">1 day</div>
+                <div className="stat-value">... day</div>
               </div>
             </div>
           </div>
@@ -302,15 +302,15 @@ export default function ProfilePage() {
 
         <main className="profile-main">
           <div className="profile-tabs">
-            <button className="tab-btn active">🎮 Games đã mua</button>
+            <button className="tab-btn active">🎮 Games has been bought</button>
           </div>
 
           {orders.length === 0 ? (
             <div className="orders-empty">
               <div className="empty-icon">🛒</div>
-              <p>Bạn chưa mua game nào</p>
+              <p>You haven't bought any game</p>
               <button className="btn-browse" onClick={() => navigate("/games")}>
-                Khám phá Games
+                Explore more games
               </button>
             </div>
           ) : (
@@ -330,7 +330,7 @@ export default function ProfilePage() {
                   />
                   <div className="order-card-thumb-placeholder">🎮</div>
                   <div className="order-card-body">
-                    <p className="order-card-name">{order.game?.name || "Game đã bị xoá"}</p>
+                    <p className="order-card-name">{order.game?.name || "Game is deleted"}</p>
                     <p className="order-card-price">
                       {order.priceAtPurchase === 0
                         ? "🆓 Free"

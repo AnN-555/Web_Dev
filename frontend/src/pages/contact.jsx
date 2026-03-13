@@ -2,13 +2,13 @@ import './auth.css';
 
 const Contact = () => {
   return (
-    <section id="contact" className="auth-page">
-      <div className="auth-container">
+    <section id="contact" className="auth-page contact-page">
+      <div className="auth-container contact-container">
         <h2 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>Contact Us</h2>
         <form
           action="https://formspree.io/f/mkonenbl"
           method="POST"
-          className="auth-form"
+          className="auth-form contact-form"
         >
           <label className="auth-label">
             Your email:
@@ -33,4 +33,3 @@ const Contact = () => {
 };
 
 export default Contact;
-

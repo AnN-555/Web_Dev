@@ -157,3 +157,26 @@
 .auth-switch a:hover {
   color: #ff8555;
 }
+
+.contact-container {
+  max-width: 880px;
+}
+
+.contact-form {
+  gap: 1.4rem;
+}
+
+.contact-form .auth-label {
+  grid-template-columns: 140px 1fr;
+}
+
+@media (max-width: 768px) {
+  .contact-container {
+    max-width: 520px;
+    padding: 2rem;
+  }
+
+  .contact-form .auth-label {
+    grid-template-columns: 1fr;
+  }
+}

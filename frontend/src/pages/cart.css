@@ -183,6 +183,68 @@
   background: #764ba2;
 }
 
+.qr-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.qr-modal {
+  background: linear-gradient(145deg, rgba(20, 24, 35, 0.98), rgba(33, 37, 41, 0.98));
+  border-radius: 16px;
+  padding: 24px 20px 20px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+  text-align: center;
+}
+
+.qr-title {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.qr-subtitle {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 16px;
+}
+
+.qr-image {
+  width: 100%;
+  max-width: 260px;
+  border-radius: 12px;
+  display: block;
+  margin: 0 auto;
+  background: #fff;
+}
+
+.qr-actions {
+  margin-top: 18px;
+  display: flex;
+  justify-content: center;
+}
+
+.btn-secondary {
+  padding: 10px 22px;
+  border-radius: 8px;
+  border: none;
+  background: #444b6e;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-secondary:hover {
+  background: #596080;
+}
+
 @media (max-width: 768px) {
   .cart-page {
     padding: 28px 0;

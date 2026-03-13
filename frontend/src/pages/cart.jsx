@@ -15,6 +15,7 @@ const Cart = () => {
   const [loading, setLoading] = useState(true);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [message, setMessage] = useState(null);
+  const [showQr, setShowQr] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -51,13 +52,10 @@ const Cart = () => {
     setCheckoutLoading(true);
     setMessage(null);
     try {
-      await cartAPI.checkout();
-      setMessage('Checkout successful! Redirecting to orders...');
-      setCart({ ...cart, items: [] });
-      window.dispatchEvent(new CustomEvent('cart-updated'));
-      setTimeout(() => {
-        window.location.href = '/orders';
-      }, 1500);
+      const res = await cartAPI.checkout();
+      // Hiển thị QR để người dùng quét thanh toán
+      setShowQr(true);
+      setMessage(res.message || 'Checkout created. Please scan the QR to complete payment.');
     } catch (err) {
       setMessage(err.response?.data?.message || 'Checkout failed');
     } finally {
@@ -157,6 +155,31 @@ const Cart = () => {
           </>
         )}
       </div>
+
+      {showQr && (
+        <div className="qr-backdrop">
+          <div className="qr-modal">
+            <h3 className="qr-title">Scan QR to pay</h3>
+            <p className="qr-subtitle">
+              Use your banking app to scan this VietQR and complete the payment.
+            </p>
+            <img
+              src="https://img.vietqr.io/image/970436-0071001196815-Reserved%20successful.png?amount=10&addInfo=Thank%20you%20for%20your%20payment&Name=ASY%20Store"
+              alt="QR Payment"
+              className="qr-image"
+            />
+            <div className="qr-actions">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setShowQr(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

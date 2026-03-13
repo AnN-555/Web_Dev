@@ -24,6 +24,12 @@ const userSchema = new mongoose.Schema(
       minlength: [6, "Password must be at least 6 characters"],
       select: false, // Không trả về password khi query
     },
+    ownedGames: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Game",
+      },
+    ],
   },
   { timestamps: true }
 );

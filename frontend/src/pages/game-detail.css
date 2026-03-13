@@ -462,3 +462,18 @@
     height: 300px;
   }
 }
+
+@media (max-width: 480px) {
+  .game-title {
+    font-size: 26px;
+    margin-bottom: 12px;
+  }
+
+  .game-hero {
+    height: 220px;
+  }
+
+  .gallery-thumb img {
+    width: 120px;
+  }
+}

@@ -121,3 +121,34 @@
   background: rgba(245, 87, 108, 0.2);
   color: #f5576c;
 }
+
+@media (max-width: 768px) {
+  .orders-page {
+    padding: 28px 0;
+  }
+
+  .orders-title {
+    font-size: 26px;
+  }
+
+  .order-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .order-item-image {
+    width: 100%;
+    height: 180px;
+  }
+
+  .order-status {
+    align-self: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .order-item-image {
+    height: 160px;
+  }
+}

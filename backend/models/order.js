@@ -23,6 +23,20 @@ const orderSchema = new mongoose.Schema(
       enum: ["pending", "completed", "cancelled"],
       default: "pending",
     },
+    paymentProvider: {
+      type: String,
+      enum: ["vnpay", "none"],
+      default: "none",
+    },
+    paymentTxnRef: {
+      type: String,
+    },
+    paymentTransactionNo: {
+      type: String,
+    },
+    paidAt: {
+      type: Date,
+    },
   },
   { timestamps: true }
 );

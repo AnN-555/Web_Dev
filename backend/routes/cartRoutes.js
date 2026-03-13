@@ -2,7 +2,9 @@ import express from "express";
 import Cart from "../models/cart.js";
 import Order from "../models/order.js";
 import Game from "../models/game.js";
+import Payment from "../models/payment.js";
 import { protect } from "../middleware/authMiddleware.js";
+import { buildQueryString, hmacSHA512, sortObject } from "../utils/vnpay.js";
 
 const router = express.Router();
 
@@ -101,7 +103,10 @@ router.post("/checkout", async (req, res) => {
       });
     }
 
-    const orders = [];
+    // Snapshot các game chưa mua để đem đi thanh toán
+    const items = [];
+    let totalAmount = 0;
+
     for (const item of cart.items) {
       const game = item.game;
       if (!game) continue;
@@ -113,23 +118,95 @@ router.post("/checkout", async (req, res) => {
       });
       if (existingOrder) continue;
 
-      const order = new Order({
-        user: req.user._id,
-        game: game._id,
-        priceAtPurchase: game.price ?? 0,
-        status: "completed",
-      });
-      await order.save();
-      orders.push(order);
+      const price = game.price ?? 0;
+      items.push({ game: game._id, priceAtPurchase: price });
+      totalAmount += price;
     }
 
-    cart.items = [];
-    await cart.save();
+    if (items.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No payable items in cart",
+      });
+    }
+
+    const payment = await Payment.create({
+      user: req.user._id,
+      provider: "vnpay",
+      status: "pending",
+      items,
+      totalAmount,
+      providerTxnRef: "", // set below
+    });
+
+    const required = (name) => {
+      const v = process.env[name];
+      if (!v) throw new Error(`${name} is not configured`);
+      return v;
+    };
+
+    const getClientIp = (req2) => {
+      const xf = req2.headers["x-forwarded-for"];
+      if (typeof xf === "string" && xf.length > 0) return xf.split(",")[0].trim();
+      return req2.socket?.remoteAddress || "127.0.0.1";
+    };
+
+    const formatVnpDate = (d = new Date()) => {
+      const pad = (n) => String(n).padStart(2, "0");
+      return (
+        d.getFullYear() +
+        pad(d.getMonth() + 1) +
+        pad(d.getDate()) +
+        pad(d.getHours()) +
+        pad(d.getMinutes()) +
+        pad(d.getSeconds())
+      );
+    };
+
+    const tmnCode = required("VNP_TMNCODE");
+    const hashSecret = required("VNP_HASHSECRET");
+    const vnpUrl = required("VNP_URL");
+    const returnUrl = required("VNP_RETURN_URL");
+
+    // VNPay expects amount in VND * 100
+    const amount = Math.round(totalAmount * 100);
+    const ipAddr = getClientIp(req);
+
+    const vnpParams = {
+      vnp_Version: "2.1.0",
+      vnp_Command: "pay",
+      vnp_TmnCode: tmnCode,
+      vnp_Locale: process.env.VNP_LOCALE || "vn",
+      vnp_CurrCode: "VND",
+      vnp_TxnRef: payment._id.toString(),
+      vnp_OrderInfo: `Pay for payment ${payment._id}`,
+      vnp_OrderType: process.env.VNP_ORDER_TYPE || "other",
+      vnp_Amount: amount,
+      vnp_ReturnUrl: returnUrl,
+      vnp_IpAddr: ipAddr,
+      vnp_CreateDate: formatVnpDate(),
+    };
+
+    if (process.env.VNP_BANKCODE) vnpParams.vnp_BankCode = process.env.VNP_BANKCODE;
+
+    const sorted = sortObject(vnpParams);
+    const signData = buildQueryString(sorted);
+    const secureHash = hmacSHA512(hashSecret, signData);
+
+    const paymentUrl = `${vnpUrl}?${signData}&vnp_SecureHash=${secureHash}`;
+
+    payment.providerTxnRef = vnpParams.vnp_TxnRef;
+    await payment.save();
 
     res.json({
       success: true,
-      data: orders,
-      message: "Checkout successful",
+      data: {
+        paymentId: payment._id,
+        paymentUrl,
+        totalAmount,
+        itemsCount: items.length,
+      },
+      message: "Redirect to VNPay to complete payment",
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

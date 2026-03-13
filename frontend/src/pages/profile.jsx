@@ -1,14 +1,11 @@
-profile.jsx
-
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import api from "../services/api";
 import "./profile.css";
 
-// ── URL helpers (giống GameCard) ──
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
-const IMAGE_BASE_URL = API_BASE_URL.replace(/\/api\/?$/, "");
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+const IMAGE_BASE_URL = API_BASE_URL;
 
 const getImageUrl = (url) => {
   if (!url) return null;
@@ -38,9 +35,11 @@ function EditProfileModal({ user, onClose, onSaved }) {
   const clearMsg   = ()  => setMsg({ type: "", text: "" });
 
   const handleInfoSave = async () => {
-    clearMsg(); setLoading(true);
+    clearMsg();
+    setLoading(true);
     try {
-      const res = await api.put("/users/profile", form);
+      // api instance có baseURL rồi, chỉ cần path /api/users/profile
+      const res = await api.put("/api/users/profile", form);
       setSuccess("Cập nhật thành công!");
       onSaved(res.data.user);
     } catch (e) {
@@ -56,7 +55,7 @@ function EditProfileModal({ user, onClose, onSaved }) {
       return setError("Mật khẩu mới tối thiểu 6 ký tự");
     setLoading(true);
     try {
-      await api.put("/users/change-password", {
+      await api.put("/api/users/change-password", {
         oldPassword: pw.oldPassword,
         newPassword: pw.newPassword,
       });
@@ -86,27 +85,21 @@ function EditProfileModal({ user, onClose, onSaved }) {
           <>
             <div className="form-group">
               <label>Username</label>
-              <input
-                value={form.username}
+              <input value={form.username}
                 onChange={e => setForm({ ...form, username: e.target.value })}
-                placeholder="Tên hiển thị"
-              />
+                placeholder="Tên hiển thị" />
             </div>
             <div className="form-group">
               <label>Quốc gia</label>
-              <input
-                value={form.country}
+              <input value={form.country}
                 onChange={e => setForm({ ...form, country: e.target.value })}
-                placeholder="Vietnam"
-              />
+                placeholder="Vietnam" />
             </div>
             <div className="form-group">
               <label>Bio</label>
-              <textarea
-                value={form.bio}
+              <textarea value={form.bio}
                 onChange={e => setForm({ ...form, bio: e.target.value })}
-                placeholder="Mô tả ngắn về bạn..."
-              />
+                placeholder="Mô tả ngắn về bạn..." />
             </div>
           </>
         )}
@@ -163,24 +156,25 @@ export default function ProfilePage() {
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [copied,          setCopied]          = useState(false);
 
-  /* ── Fetch data ── */
   useEffect(() => {
     if (!authUser) { navigate("/login"); return; }
     (async () => {
       try {
         const [pRes, oRes] = await Promise.all([
-          api.get("/users/profile"),
-          api.get("/orders"),
+          api.get("/api/users/profile"),   // baseURL + /api/users/profile
+          api.get("/api/orders"),           // baseURL + /api/orders
         ]);
+        // api.get trả về axios response, .data = payload backend
+        // profile backend: { user: {...} }
+        // orders backend:  { success, data: [...] }
         setProfile(pRes.data.user);
-        setOrders(oRes.data.data || []);
+        setOrders(oRes.data?.data || []);
       } catch (e) {
-        console.error(e);
+        console.error("Fetch error:", e);
       } finally { setLoading(false); }
     })();
   }, [authUser]);
 
-  /* ── Upload avatar ── */
   const handleAvatarChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -188,7 +182,7 @@ export default function ProfilePage() {
     try {
       const fd = new FormData();
       fd.append("avatar", file);
-      const res = await api.post("/auth/upload-avatar", fd, {
+      const res = await api.post("/api/auth/upload-avatar", fd, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       const updated = { ...profile, avatar: res.data.avatarUrl };
@@ -202,13 +196,11 @@ export default function ProfilePage() {
     }
   };
 
-  /* ── Sau khi save edit ── */
   const handleSaved = (updatedUser) => {
     setProfile(updatedUser);
     if (setUser) setUser(prev => ({ ...prev, ...updatedUser }));
   };
 
-  /* ── Share ── */
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
     setCopied(true);
@@ -224,20 +216,13 @@ export default function ProfilePage() {
       day: "2-digit", month: "2-digit", year: "numeric",
     });
 
-  if (loading) return (
-    <div className="profile-loading">⏳ Đang tải...</div>
-  );
+  if (loading) return <div className="profile-loading">⏳ Đang tải...</div>;
 
   return (
     <div className="profile-page">
-
-      {/* ── Banner ── */}
       <div className="profile-banner" />
 
-      {/* ── Avatar + tên + buttons ── */}
       <div className="profile-identity-row">
-
-        {/* Avatar */}
         <div className="profile-avatar-wrap">
           <img
             src={getImageUrl(profile?.avatar)}
@@ -250,35 +235,22 @@ export default function ProfilePage() {
               e.target.nextSibling.style.display = "flex";
             }}
           />
-          <div
-            className="profile-avatar-placeholder"
-            style={{ display: profile?.avatar ? "none" : "flex" }}
-          >
+          <div className="profile-avatar-placeholder"
+            style={{ display: profile?.avatar ? "none" : "flex" }}>
             🐱
           </div>
-
-          {/* Nút camera */}
           <label className="avatar-upload-btn" title="Đổi ảnh đại diện">
             {avatarUploading ? "⏳" : "📷"}
-            <input
-              type="file"
-              accept="image/*"
-              ref={avatarRef}
-              onChange={handleAvatarChange}
-            />
+            <input type="file" accept="image/*" ref={avatarRef} onChange={handleAvatarChange} />
           </label>
         </div>
 
-        {/* Tên + country + bio */}
         <div className="profile-name-block">
           <h1 className="profile-username">{profile?.username}</h1>
           <p className="profile-country">📍 {profile?.country || "Vietnam"}</p>
-          {profile?.bio && (
-            <p className="profile-bio">{profile.bio}</p>
-          )}
+          {profile?.bio && <p className="profile-bio">{profile.bio}</p>}
         </div>
 
-        {/* Buttons */}
         <div className="profile-action-btns">
           <button className="btn-edit-profile" onClick={() => setShowModal(true)}>
             ✏️ <span>Edit profile</span>
@@ -289,16 +261,12 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* ── Body ── */}
       <div className="profile-body">
-
-        {/* Sidebar */}
         <aside className="profile-sidebar">
           <div className="sidebar-card">
             <h3>Friends</h3>
             <p className="friends-count">0 friends</p>
           </div>
-
           <div className="sidebar-card">
             <h3>Stats</h3>
             <div className="stat-row">
@@ -332,7 +300,6 @@ export default function ProfilePage() {
           </div>
         </aside>
 
-        {/* Main */}
         <main className="profile-main">
           <div className="profile-tabs">
             <button className="tab-btn active">🎮 Games đã mua</button>
@@ -349,12 +316,8 @@ export default function ProfilePage() {
           ) : (
             <div className="orders-grid">
               {orders.map(order => (
-                <div
-                  key={order._id}
-                  className="order-card"
-                  onClick={() => navigate(`/games/${order.game?.slug}`)}
-                >
-                  {/* Ảnh game */}
+                <div key={order._id} className="order-card"
+                  onClick={() => navigate(`/games/${order.game?.slug}`)}>
                   <img
                     src={getImageUrl(order.game?.headerImage)}
                     alt={order.game?.name || "game"}
@@ -366,20 +329,14 @@ export default function ProfilePage() {
                     }}
                   />
                   <div className="order-card-thumb-placeholder">🎮</div>
-
-                  {/* Thông tin game */}
                   <div className="order-card-body">
-                    <p className="order-card-name">
-                      {order.game?.name || "Game đã bị xoá"}
-                    </p>
+                    <p className="order-card-name">{order.game?.name || "Game đã bị xoá"}</p>
                     <p className="order-card-price">
                       {order.priceAtPurchase === 0
                         ? "🆓 Free"
                         : `💰 ${order.priceAtPurchase.toLocaleString("vi-VN")}đ`}
                     </p>
-                    <p className="order-card-date">
-                      🗓 {fmtDate(order.createdAt)}
-                    </p>
+                    <p className="order-card-date">🗓 {fmtDate(order.createdAt)}</p>
                   </div>
                 </div>
               ))}
@@ -388,7 +345,6 @@ export default function ProfilePage() {
         </main>
       </div>
 
-      {/* Modal */}
       {showModal && (
         <EditProfileModal
           user={profile}

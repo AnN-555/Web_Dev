@@ -13,6 +13,7 @@ const generateToken = (id) => {
   return jwt.sign({ id }, secret, { expiresIn });
 };
 
+
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
@@ -112,7 +113,6 @@ router.get("/me", protect, async (req, res) => {
   }
 });
 
-
 router.post("/upload-avatar", protect, upload.single("avatar"), async (req, res) => {
   try {
     if (!req.file) {
@@ -132,6 +132,7 @@ router.post("/upload-avatar", protect, upload.single("avatar"), async (req, res)
       stream.end(req.file.buffer);
     });
 
+    // Lưu URL vào user
     const user = await User.findByIdAndUpdate(
       req.user._id,
       { avatar: result.secure_url },
@@ -148,5 +149,4 @@ router.post("/upload-avatar", protect, upload.single("avatar"), async (req, res)
     res.status(500).json({ message: error.message });
   }
 });
-
 export default router;

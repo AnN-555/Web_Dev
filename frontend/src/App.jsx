@@ -32,10 +32,7 @@ function App() {
             <Route path="/forums/:id" element={<ForumDetail />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-<<<<<<< HEAD
             <Route path="/profile" element={<Profile />} />
-=======
->>>>>>> 1e9983e16d078a0cdec829f4909d85775ef2c2dd
           </Routes>
           <Footer />
         </div>

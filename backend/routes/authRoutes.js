@@ -12,7 +12,6 @@ const generateToken = (id) => {
   return jwt.sign({ id }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 };
 
-<<<<<<< HEAD
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -23,10 +22,8 @@ const upload = multer({
   },
 });
 
-=======
 // @route   POST /api/auth/register
 // @desc    Đăng ký user mới
->>>>>>> 1e9983e16d078a0cdec829f4909d85775ef2c2dd
 router.post("/register", async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -117,7 +114,6 @@ router.post("/login", async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
 router.post("/upload-avatar", protect, upload.single("avatar"), async (req, res) => {
   try {
     if (!req.file) {
@@ -155,7 +151,6 @@ router.post("/upload-avatar", protect, upload.single("avatar"), async (req, res)
   }
 });
 export default router;
-=======
 // @route   POST /api/auth/logout
 // @desc    Đăng xuất (client xóa token, endpoint này để tương thích / có thể mở rộng blacklist)
 router.post("/logout", protect, (req, res) => {
@@ -175,4 +170,3 @@ router.get("/me", protect, (req, res) => {
 });
 
 export default router;
->>>>>>> 1e9983e16d078a0cdec829f4909d85775ef2c2dd

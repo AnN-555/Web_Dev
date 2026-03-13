@@ -9,10 +9,7 @@ import Login from './pages/login.jsx';
 import Register from './pages/register.jsx';
 import Cart from './pages/cart.jsx';
 import Orders from './pages/orders.jsx';
-import Contact from './pages/contact.jsx';
-import Forums from './pages/forums.jsx';
-import ForumDetail from './pages/forum-detail.jsx';
-import ProfilePage from './pages/profile.jsx';
+import Profile from "./pages/profile";
 import './App.css';
 
 function App() {
@@ -27,12 +24,9 @@ function App() {
             <Route path="/games/:slug" element={<GameDetail />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/orders" element={<Orders />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/forums" element={<Forums />} />
-            <Route path="/forums/:id" element={<ForumDetail />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/profile" element={<Profile />} />
           </Routes>
           <Footer />
         </div>

@@ -2,6 +2,8 @@ import express from "express";
 import User from "../models/user.js";
 import { protect } from "../middleware/authMiddleware.js";
 
+
+
 const router = express.Router();
 
 router.get("/profile", protect, async (req, res) => {

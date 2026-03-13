@@ -15,6 +15,7 @@ import ForumDetail from './pages/forum-detail.jsx';
 import Profile from './pages/profile.jsx';
 import './App.css';
 
+
 function App() {
   return (
     <AuthProvider>

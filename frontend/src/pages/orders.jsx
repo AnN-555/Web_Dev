@@ -4,6 +4,9 @@ import { orderAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import './orders.css';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const IMAGE_BASE_URL = API_BASE_URL.replace(/\/api\/?$/, '');
+
 const formatPrice = (price) => {
   if (price == null || price === 0) return 'Free';
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'VND' }).format(price);
@@ -74,11 +77,10 @@ const Orders = () => {
               <div key={order._id} className="order-item">
                 <Link to={`/games/${order.game?.slug}`} className="order-item-image">
                   <img
-                    src={order.game?.headerImage}
+                    src={`${IMAGE_BASE_URL}/database/${order.game?.headerImage}`}
                     alt={order.game?.name}
                     onError={(e) => {
-                      e.target.src =
-                        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='80'%3E%3Crect fill='%23222' width='120' height='80'/%3E%3Ctext fill='%23666' x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='10'%3ENo Image%3C/text%3E%3C/svg%3E";
+                      e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='80'%3E%3Crect fill='%23222' width='120' height='80'/%3E%3Ctext fill='%23666' x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='10'%3ENo Image%3C/text%3E%3C/svg%3E";
                     }}
                   />
                 </Link>
